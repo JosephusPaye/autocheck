@@ -1,0 +1,40 @@
+[
+  {
+    "type": "embed",
+    "label": "Cover Sheet",
+    "files": ["**/*.pdf"]
+  },
+  {
+    "type": "shell",
+    "label": "Compiles",
+    "command": "make"
+  },
+  {
+    "type": "shell",
+    "label": "Functions",
+    "if": "Compiles",
+    "command": "./assignment1.exe"
+  },
+  {
+    "type": "match",
+    "label": "Errors",
+    "if": "Functions",
+    "actual": "output:Functions",
+    "expected": "file:./expected-output.txt"
+  },
+  {
+    "type": "search",
+    "label": "Destructors",
+    "syntax": "cpp",
+    "patterns": {
+      "Node::~Node": ["./Node.h", "./Node.cpp"],
+      "LinkedList::~LinkedList": ["./LinkedList.h", "./LinkedList.cpp"],
+      "someThing": {
+        "files": ["./Node.h", "./Node.cpp"],
+        "anchorInFile": "start",
+        "caseSensitive": true,
+        "regex": true
+      }
+    }
+  }
+]

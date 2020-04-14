@@ -1,0 +1,12 @@
+{
+  "name": "autocheck",
+  "private": true,
+  "dependencies": {
+    "copy-dir": "^1.2.0",
+    "picomatch": "^2.2.2",
+    "rimraf": "^3.0.2"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.4"
+  }
+}
