@@ -1,7 +1,10 @@
 <template>
   <div id="app">
+    <div class="bg-gray-900 text-white">
+      <div class="container mx-auto px-4 py-3 text-2xl">{{ report.title }} – Autocheck report</div>
+    </div>
     <component
-      :is="checkToComponent[check.type]"
+      :is="checkToComponent[check.config.type]"
       :key="i"
       :check="check"
       v-for="(check, i) in report.checks"
@@ -10,20 +13,20 @@
 </template>
 
 <script>
-import EmbedCheck from './components/EmbedCheck.vue';
+import FileCheck from './components/FileCheck.vue';
 
 export default {
   name: 'App',
 
   components: {
-    EmbedCheck,
+    FileCheck,
   },
 
   data() {
     return {
-      report: window.autocheckReport,
+      report: window.autocheckReport || { title: 'Untitled', checks: [] },
       checkToComponent: {
-        embed: 'EmbedCheck',
+        file: 'FileCheck',
       },
     };
   },
