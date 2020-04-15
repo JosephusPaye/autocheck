@@ -1,5 +1,5 @@
 const { pathToFileURL } = require('url');
-const { extname } = require('path');
+const { extname, basename } = require('path');
 const { expandGlobs, readAndCacheString } = require('../files');
 
 module.exports = function performFileCheck(
@@ -13,8 +13,11 @@ module.exports = function performFileCheck(
   return {
     config: checkConfiguration,
     results: matchingFiles.map((file) => {
+      // Fallback to the basename for files without an extension (e.g. makefiles)
+      const extension = extname(file.path).slice(1) || basename(file.path);
+
       const result = {
-        type: extname(file.path).toLowerCase().slice(1),
+        type: extension.toLowerCase(),
         url: pathToFileURL(file.path),
         relativePath: file.relativePath,
       };

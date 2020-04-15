@@ -1,13 +1,13 @@
 [
   {
     "type": "file",
-    "label": "Cover Sheet",
-    "patterns": ["**/*.pdf"]
+    "label": "Cover Sheet and README",
+    "patterns": ["**/*.pdf", "**/README.{txt,md}"]
   },
   {
     "type": "file",
-    "label": "README",
-    "patterns": ["**/README.{txt,md}"]
+    "label": "Code Files",
+    "patterns": ["makefile", "*.h", "*.cpp"]
   },
   {
     "type": "shell",

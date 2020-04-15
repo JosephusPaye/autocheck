@@ -25,10 +25,14 @@ export default {
   },
 
   data() {
+    const report = window.autocheckReport || {
+      title: 'Untitled',
+      checks: [],
+    };
     return {
-      report: window.autocheckReport || {
-        title: 'Untitled',
-        checks: [],
+      report: {
+        title: report.title,
+        checks: report.checks,
       },
       checkToComponent: {
         file: 'FileCheck',
@@ -40,6 +44,7 @@ export default {
 
 <style lang="scss">
 @import './assets/tailwind.css';
+@import './assets/prism-okaidia.css';
 
 body {
   color: rgba(0, 0, 0, 0.87);

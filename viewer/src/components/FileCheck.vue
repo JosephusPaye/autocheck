@@ -19,13 +19,14 @@
       :total="pagination.total"
       :current.sync="pagination.current"
     />
-    <div
-      v-if="check.results.length > 0"
-      slot="preview"
-      class="overflow-auto"
-      style="height: 720px;"
-    >
-      <img v-if="isImage(file.type)" :src="file.url" />
+    <div v-if="check.results.length > 0" slot="preview">
+      <div
+        v-if="isImage(file.type)"
+        class="overflow-auto w-full"
+        style="height: 720px;"
+      >
+        <img :src="file.url" />
+      </div>
       <Prism
         v-else-if="isCode(file.type)"
         style="height: 720px; overflow-x: auto"
@@ -45,11 +46,11 @@
 
 <script>
 import 'prismjs';
-import 'prismjs/themes/prism-okaidia.css';
 import 'prismjs/components/prism-makefile';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-clike';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
 import Prism from 'vue-prism-component';
 
 import CheckResult from './CheckResult.vue';
@@ -77,10 +78,10 @@ export default {
         total: this.check.results.length,
       },
       extensionToLanguage: {
-        c: 'clike',
-        cpp: 'clike',
-        hpp: 'clike',
-        h: 'clike',
+        c: 'c',
+        cpp: 'cpp',
+        hpp: 'cpp',
+        h: 'cpp',
         makefile: 'makefile',
         java: 'java',
         md: 'markdown',
@@ -148,32 +149,5 @@ code[class*='language-'] {
   @screen md {
     font-size: 1em;
   }
-}
-
-/*
- * purgecss keeps removing (some!) prism styles, even when ignored 😡.
- * So the following two blocks repeat the ones we actually use.
- */
-.token.keyword,
-.token.property,
-.token.selector,
-.token.constant,
-.token.symbol,
-.token.builtin {
-  color: hsl(53, 89%, 79%);
-}
-
-.token.attr-name,
-.token.attr-value,
-.token.string,
-.token.char,
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string,
-.token.variable,
-.token.inserted {
-  color: hsl(76, 21%, 52%);
 }
 </style>
