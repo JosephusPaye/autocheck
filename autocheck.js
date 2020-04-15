@@ -1,7 +1,7 @@
 const path = require('path');
-const performEmbedCheck = require('./checks/embed');
-const { readString } = require('./files');
+const performFileCheck = require('./checks/file');
 const { copySupportingFiles, createReport } = require('./report');
+const { getFileCache } = require('./files');
 
 const targetDirectories = process.argv
   .slice(2)
@@ -12,24 +12,15 @@ if (targetDirectories.length === 0) {
   process.exit();
 }
 
-function performCheck(check, targetDirectory) {
-  if (check.type === 'embed') {
-    return performEmbedCheck(check, targetDirectory);
+function performCheck(checkConfiguration, targetDirectory) {
+  if (checkConfiguration.type === 'file') {
+    return performFileCheck(checkConfiguration, targetDirectory);
   }
-}
-
-let reportTemplate;
-function getReportTemplate() {
-  if (reportTemplate) {
-    return reportTemplate;
-  }
-
-  reportTemplate = readString;
 }
 
 const checks = require('./checks.json');
 const results = targetDirectories.map((directory) => {
-  return {
+  const report = {
     title: path.basename(directory),
     checks: checks
       .map((check) => {
@@ -37,9 +28,9 @@ const results = targetDirectories.map((directory) => {
       })
       .filter(Boolean),
   };
+  report.fileContents = getFileCache(directory);
+  return report;
 });
-
-// console.dir(results, { colors: true, depth: 999 });
 
 copySupportingFiles(() => {
   console.log('copied supporting files');

@@ -1,7 +1,9 @@
 <template>
-  <div id="app">
-    <div class="bg-gray-900 text-white">
-      <div class="container mx-auto px-4 py-3 text-2xl">{{ report.title }} – Autocheck report</div>
+  <div id="app" style="padding-top: 60px;">
+    <div class="bg-gray-900 text-white w-full fixed top-0">
+      <div class="container mx-auto px-4 py-3 text-2xl">
+        {{ report.title }} – Autocheck report
+      </div>
     </div>
     <component
       :is="checkToComponent[check.config.type]"
@@ -24,7 +26,10 @@ export default {
 
   data() {
     return {
-      report: window.autocheckReport || { title: 'Untitled', checks: [] },
+      report: window.autocheckReport || {
+        title: 'Untitled',
+        checks: [],
+      },
       checkToComponent: {
         file: 'FileCheck',
       },

@@ -3,7 +3,9 @@ const path = require('path');
 const picomatch = require('picomatch');
 
 module.exports.expandGlobs = function expandGlobs(rootDirectory, globs) {
-  const isMatch = picomatch(globs);
+  const isMatch = picomatch(globs, {
+    nocase: true,
+  });
   return listFiles(rootDirectory, rootDirectory).filter((file) => {
     return isMatch(file.relativePath);
   });
@@ -11,6 +13,22 @@ module.exports.expandGlobs = function expandGlobs(rootDirectory, globs) {
 
 module.exports.readString = function readString(filePath) {
   return fs.readFileSync(filePath, 'utf8');
+};
+
+const fileCache = {};
+module.exports.readAndCacheString = function readAndCacheString(
+  filePath,
+  key,
+  namespace
+) {
+  const local = fileCache[namespace] || {};
+  local[key] = fs.readFileSync(filePath, 'utf8');
+  fileCache[namespace] = local;
+  return key;
+};
+
+module.exports.getFileCache = function getFileCache(namespace) {
+  return fileCache[namespace] || {};
 };
 
 module.exports.writeString = function writeString(filePath, string) {

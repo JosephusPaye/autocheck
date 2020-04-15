@@ -2,7 +2,10 @@
   <div>
     <div class="border-t border-gray-600 bg-gray-800 text-white">
       <div class="container px-4 py-3 leading-none mx-auto flex items-center">
-        <div :title="tooltips[status] || 'Check result partial or unknown'" class="mr-3">
+        <div
+          :title="tooltips[status] || 'Check result partial or unknown'"
+          class="mr-3"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"

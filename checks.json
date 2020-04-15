@@ -1,8 +1,13 @@
 [
   {
-    "type": "embed",
+    "type": "file",
     "label": "Cover Sheet",
-    "files": ["**/*.pdf"]
+    "patterns": ["**/*.pdf"]
+  },
+  {
+    "type": "file",
+    "label": "README",
+    "patterns": ["**/README.{txt,md}"]
   },
   {
     "type": "shell",
