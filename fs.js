@@ -26,9 +26,16 @@ async function readString(filePath) {
 
 const fileCache = {};
 async function readStringAndCache(filePath, key, namespace) {
-  const local = fileCache[namespace] || {};
-  local[key] = await fsReadFile(filePath, 'utf8');
-  fileCache[namespace] = local;
+  const content = await fsReadFile(filePath, 'utf8');
+
+  if (fileCache[namespace] === undefined) {
+    fileCache[namespace] = {
+      [key]: content,
+    };
+  } else {
+    fileCache[namespace][key] = content;
+  }
+
   return key;
 }
 
