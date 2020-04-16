@@ -1,8 +1,10 @@
 const path = require('path');
 
 const { getFileCache } = require('./fs');
-const performFileCheck = require('./check-file');
 const { copySupportingFiles, createReport } = require('./report');
+
+const performFileCheck = require('./check-file');
+const performCommandCheck = require('./check-command');
 
 async function main() {
   const targetDirectories = getTargetDirectories();
@@ -58,7 +60,10 @@ function getChecks() {
 }
 
 async function performCheck(checkConfiguration, targetDirectory) {
-  if (checkConfiguration.type === 'file') {
-    return performFileCheck(checkConfiguration, targetDirectory);
+  switch (checkConfiguration.type) {
+    case 'file':
+      return performFileCheck(checkConfiguration, targetDirectory);
+    case 'command':
+      return performCommandCheck(checkConfiguration, targetDirectory);
   }
 }

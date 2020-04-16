@@ -16,12 +16,14 @@
 
 <script>
 import FileCheck from './components/FileCheck.vue';
+import CommandCheck from './components/CommandCheck.vue';
 
 export default {
   name: 'App',
 
   components: {
     FileCheck,
+    CommandCheck,
   },
 
   data() {
@@ -36,6 +38,7 @@ export default {
       },
       checkToComponent: {
         file: 'FileCheck',
+        command: 'CommandCheck',
       },
     };
   },

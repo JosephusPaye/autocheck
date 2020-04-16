@@ -3,8 +3,10 @@
   "private": true,
   "dependencies": {
     "copy-dir": "^1.2.0",
+    "execa": "^4.0.0",
     "picomatch": "^2.2.2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "upath": "^1.2.0"
   },
   "devDependencies": {
     "prettier": "^2.0.4"

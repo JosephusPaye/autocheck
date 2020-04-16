@@ -20,7 +20,7 @@ module.exports = async function performFileCheck(
 
     const result = {
       type: extension.toLowerCase(),
-      url: url.pathToFileURL(file.path),
+      url: url.pathToFileURL(file.path).toString(),
       relativePath: file.relativePath,
     };
 

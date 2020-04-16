@@ -10,9 +10,16 @@
     "patterns": ["makefile", "*.h", "*.cpp"]
   },
   {
-    "type": "shell",
+    "type": "command",
     "label": "Compiles",
-    "command": "make"
+    "command": "make clean && make",
+    "runInCygwin": true,
+    "cygwinBin": "C:\\Users\\jpaye\\AppData\\Local\\scoop\\apps\\cygwin\\current\\root\\bin\\"
+  },
+  {
+    "type": "command",
+    "label": "Compiles",
+    "command": "git status"
   },
   {
     "type": "shell",

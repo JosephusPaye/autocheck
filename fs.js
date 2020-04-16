@@ -12,6 +12,9 @@ module.exports.listFiles = listFiles;
 module.exports.expandGlobs = expandGlobs;
 module.exports.cleanContents = cleanContents;
 module.exports.copyDirectory = copyDirectory;
+module.exports.fileExists = fileExists;
+module.exports.directoryExists = directoryExists;
+module.exports.createReadStream = fs.createReadStream;
 
 const fsReadFile = promisify(fs.readFile);
 const fsWriteFile = promisify(fs.writeFile);
@@ -84,6 +87,22 @@ async function cleanContents(directory) {
 
 async function copyDirectory(source, destination, options) {
   return copydirPromised(source, destination, options);
+}
+
+async function fileExists(filePath) {
+  try {
+    return (await fsStat(filePath)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+async function directoryExists(directoryPath) {
+  try {
+    return (await fsStat(directoryPath)).isDirectory();
+  } catch {
+    return false;
+  }
 }
 
 function promisify(fn) {
