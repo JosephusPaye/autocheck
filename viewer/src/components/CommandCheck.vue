@@ -1,5 +1,8 @@
 <template>
-  <CheckResult :label="check.config.label" :status="successful ? 'passed' : 'failed'">
+  <CheckResult
+    :label="check.config.label"
+    :status="successful ? 'passed' : 'failed'"
+  >
     <CheckDetails slot="meta" :type="check.config.type" :details="details" />
     <div v-if="check.result" slot="preview">
       <pre
