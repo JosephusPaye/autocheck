@@ -2,10 +2,7 @@
   <div>
     <div class="border-t border-gray-600 bg-gray-800 text-white">
       <div class="container px-4 py-3 leading-none mx-auto flex items-center">
-        <div
-          :title="tooltips[status] || 'Check result partial or unknown'"
-          class="mr-3"
-        >
+        <div :title="tooltips[status] || 'Check result partial or unknown'" class="mr-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -49,6 +46,22 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            class="text-gray-400"
+            v-else-if="status === 'skipped'"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
             class="text-yellow-500"
             v-else
           >
@@ -73,8 +86,34 @@
       <div class="w-1/3 pr-6" v-if="$slots.meta">
         <slot name="meta"></slot>
       </div>
-      <div class="w-2/3" v-if="$slots.preview">
-        <slot name="preview"></slot>
+      <div class="w-2/3">
+        <div
+          v-if="error"
+          class="flex flex-col h-full w-full border rounded justify-center items-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-red-500"
+          >
+            <path
+              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+            />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span class="mt-3 text-lg text-gray-700">{{ error }}</span>
+        </div>
+        <template v-else-if="$slots.preview">
+          <slot name="preview"></slot>
+        </template>
       </div>
     </div>
   </div>
@@ -84,7 +123,7 @@
 import IconChevron from './IconChevron.vue';
 
 export default {
-  name: 'CheckPane',
+  name: 'CheckResult',
 
   components: {
     IconChevron,
@@ -93,6 +132,7 @@ export default {
   props: {
     label: String,
     status: String,
+    error: String,
   },
 
   data() {
@@ -101,6 +141,7 @@ export default {
       tooltips: {
         passed: 'Check passed',
         failed: 'Check failed',
+        skipped: 'Check skipped',
       },
     };
   },

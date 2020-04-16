@@ -14,7 +14,7 @@ module.exports = async function performCommandCheck(
   ) {
     return {
       config: checkConfiguration,
-      result: {},
+      status: 'failed',
       error: 'No `command` specified for this check.',
     };
   }
@@ -26,7 +26,7 @@ module.exports = async function performCommandCheck(
   ) {
     return {
       config: checkConfiguration,
-      result: {},
+      status: 'failed',
       error: 'The `cygwinBin` option is required to run a command in Cygwin.',
     };
   }
@@ -39,6 +39,7 @@ module.exports = async function performCommandCheck(
     return {
       config: checkConfiguration,
       result: { directory },
+      status: 'failed',
       error: `Command working directory not found or inaccessible: ${directory}`,
     };
   }
@@ -73,13 +74,14 @@ module.exports = async function performCommandCheck(
 
   return {
     config: checkConfiguration,
+    status: exitCode === 0 ? 'passed' : 'failed',
     result: {
       directory: checkConfiguration.runInCygwin
         ? toCygpath(directory)
         : directory,
-      output,
       exitCode,
     },
+    output,
   };
 };
 

@@ -1,8 +1,5 @@
 <template>
-  <CheckResult
-    :label="check.config.label"
-    :status="successful ? 'passed' : 'failed'"
-  >
+  <CheckResult :label="check.config.label" :status="check.status" :error="check.error">
     <CheckDetails slot="meta" :type="check.config.type" :details="details" />
     <div v-if="check.result" slot="preview">
       <pre
@@ -49,28 +46,39 @@ export default {
           label: 'Input File',
           values: [this.check.config.input || '(none)'],
         },
-        {
-          label: 'Exit code',
-          values: [this.check.result.exitCode],
-        },
       ];
+
       if (this.check.config.runInCygwin) {
         details.unshift({
           label: 'Cygwin',
           values: ['true'],
         });
       }
+
+      if (this.check.result) {
+        details.push({
+          label: 'Exit code',
+          values: [this.check.result.exitCode],
+        });
+      }
+
       return details;
     },
 
     output() {
-      const directoryIndicator = `<span class="token string">${this.check.result.directory}</span>`;
+      if (!this.check.result) {
+        return '';
+      }
+
+      const { result, output: outputText, config } = this.check;
+
+      const directoryIndicator = `<span class="token string">${result.directory}</span>`;
       const prompt = `<span class="token keyword">&gt;</span> ${
-        this.check.config.command
-      } ${this.check.config.input ? '< ' + this.check.config.input : ''}`;
-      const output = `<span class="token ${this.successful ? '' : 'deleted'}">${
-        this.check.result.output
-      }</span>`;
+        config.command
+      } ${config.input ? '< ' + config.input : ''}`;
+      const output = `<span class="token ${
+        this.successful ? '' : 'deleted'
+      }">${outputText}</span>`;
       return directoryIndicator + '\n' + prompt + '\n' + output;
     },
   },

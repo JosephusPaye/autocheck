@@ -33,7 +33,9 @@ module.exports = async function performFileCheck(
 
   return {
     config: checkConfiguration,
+    status: results.length > 0 ? 'passed' : 'failed',
     results,
+    error: results.length > 0 ? undefined : 'No matching files found',
   };
 };
 

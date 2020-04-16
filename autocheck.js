@@ -12,15 +12,54 @@ async function main() {
   const results = [];
 
   for (directory of targetDirectories) {
-    const tasks = checks.map((check) => {
-      return performCheck(check, directory);
-    });
+    const completedCheckStatuses = {};
+    const checkResults = [];
 
-    const checkResults = await Promise.all(tasks);
+    for (const check of checks) {
+      let checkResult;
+
+      if (check.if) {
+        const dependency = completedCheckStatuses[check.if];
+
+        if (dependency) {
+          if (dependency.status === 'passed') {
+            checkResult = await performCheck(check, directory);
+          } else {
+            checkResult = {
+              config: check,
+              status: 'skipped',
+              error: `Check skipped because the check it depends on, ${quote(
+                check.if
+              )}, ${
+                dependency.status === 'skipped' ? 'was skipped' : 'failed'
+              }.`,
+            };
+          }
+        } else {
+          checkResult = {
+            config: check,
+            status: 'skipped',
+            error: `Check skipped because the check it depends on, ${quote(
+              check.if
+            )}, was not found. Make sure the referenced check exists and appears before this check.`,
+          };
+        }
+      } else {
+        checkResult = await performCheck(check, directory);
+      }
+
+      if (checkResult) {
+        completedCheckStatuses[check.label] = {
+          status: checkResult.status,
+          output: checkResult.output,
+        };
+        checkResults.push(checkResult);
+      }
+    }
 
     results.push({
       title: path.basename(directory),
-      checks: checkResults.filter(Boolean),
+      checks: checkResults,
       fileContents: getFileCache(directory),
     });
   }
@@ -66,4 +105,8 @@ async function performCheck(checkConfiguration, targetDirectory) {
     case 'command':
       return performCommandCheck(checkConfiguration, targetDirectory);
   }
+}
+
+function quote(text, delimiter = '`') {
+  return delimiter + text + delimiter;
 }

@@ -1,7 +1,7 @@
 [
   {
     "type": "file",
-    "label": "Cover Sheet and README",
+    "label": "Cover Sheet and Readme",
     "patterns": ["**/*.pdf", "**/README.{txt,md}"]
   },
   {
@@ -18,35 +18,10 @@
   },
   {
     "type": "command",
-    "label": "Compiles",
-    "command": "git status"
-  },
-  {
-    "type": "shell",
-    "label": "Functions",
+    "label": "Runs",
     "if": "Compiles",
-    "command": "./assignment1.exe"
-  },
-  {
-    "type": "match",
-    "label": "Errors",
-    "if": "Functions",
-    "actual": "output:Functions",
-    "expected": "file:./expected-output.txt"
-  },
-  {
-    "type": "search",
-    "label": "Destructors",
-    "syntax": "cpp",
-    "patterns": {
-      "Node::~Node": ["./Node.h", "./Node.cpp"],
-      "LinkedList::~LinkedList": ["./LinkedList.h", "./LinkedList.cpp"],
-      "someThing": {
-        "files": ["./Node.h", "./Node.cpp"],
-        "anchorInFile": "start",
-        "caseSensitive": true,
-        "regex": true
-      }
-    }
+    "command": "./test.exe 0a9dufiauf",
+    "runInCygwin": true,
+    "cygwinBin": "C:\\Users\\jpaye\\AppData\\Local\\scoop\\apps\\cygwin\\current\\root\\bin\\"
   }
 ]
