@@ -1,33 +1,39 @@
-const { pathToFileURL } = require('url');
-const { extname, basename } = require('path');
-const { expandGlobs, readAndCacheString } = require('../files');
+const url = require('url');
+const path = require('path');
 
-module.exports = function performFileCheck(
+const { expandGlobs, readStringAndCache } = require('../fs');
+
+module.exports = async function performFileCheck(
   checkConfiguration,
   targetDirectory
 ) {
-  const matchingFiles = expandGlobs(
+  const results = [];
+  const matchingFiles = await expandGlobs(
     targetDirectory,
     checkConfiguration.patterns
   );
+
+  for (const file of matchingFiles) {
+    // Fallback to the basename for files without an extension (e.g. makefiles)
+    const extension =
+      path.extname(file.path).slice(1) || path.basename(file.path);
+
+    const result = {
+      type: extension.toLowerCase(),
+      url: url.pathToFileURL(file.path),
+      relativePath: file.relativePath,
+    };
+
+    if (isCode(result.type)) {
+      await readStringAndCache(file.path, file.relativePath, targetDirectory);
+    }
+
+    results.push(result);
+  }
+
   return {
     config: checkConfiguration,
-    results: matchingFiles.map((file) => {
-      // Fallback to the basename for files without an extension (e.g. makefiles)
-      const extension = extname(file.path).slice(1) || basename(file.path);
-
-      const result = {
-        type: extension.toLowerCase(),
-        url: pathToFileURL(file.path),
-        relativePath: file.relativePath,
-      };
-
-      if (isCode(result.type)) {
-        readAndCacheString(file.path, file.relativePath, targetDirectory);
-      }
-
-      return result;
-    }),
+    results,
   };
 };
 

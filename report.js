@@ -1,21 +1,28 @@
 const path = require('path');
-const rimraf = require('rimraf');
-const copydir = require('copy-dir');
 
-const { readString, writeString } = require('./files');
+const {
+  readString,
+  writeString,
+  cleanContents,
+  copyDirectory,
+} = require('./fs');
+
+module.exports.createReport = createReport;
+module.exports.copySupportingFiles = copySupportingFiles;
 
 const viewerDistDirectory = path.join(__dirname, 'viewer', 'dist');
 const resultsDirectory = path.join(__dirname, 'results');
 
 let reportTemplate;
-function getReportTemplate() {
+async function getReportTemplate() {
   if (reportTemplate) {
     return reportTemplate;
   }
 
   try {
-    reportTemplate = readString(path.join(viewerDistDirectory, 'index.html'));
-
+    reportTemplate = await readString(
+      path.join(viewerDistDirectory, 'index.html')
+    );
     return reportTemplate;
   } catch (err) {
     console.error('Unable to report template', err);
@@ -23,35 +30,27 @@ function getReportTemplate() {
   }
 }
 
-module.exports.createReport = function createReport(result) {
-  const template = getReportTemplate();
+async function createReport(result) {
+  const template = await getReportTemplate();
   const report = template
     .replace('$TITLE', result.title)
     .replace('$REPORT', JSON.stringify(result));
 
-  writeString(
+  return writeString(
     path.join(resultsDirectory, result.title.trim() + '.html'),
     report
   );
-};
+}
 
-module.exports.copySupportingFiles = function copySupportingFiles(callback) {
-  rimraf(resultsDirectory + '/*', () => {
-    copydir(
-      viewerDistDirectory,
-      resultsDirectory,
-      {
-        filter(stat, filepath) {
-          // Don't copy .html files
-          if (stat === 'file' && path.extname(filepath) === '.html') {
-            return false;
-          }
-          return true;
-        },
-      },
-      () => {
-        callback();
+async function copySupportingFiles() {
+  await cleanContents(resultsDirectory);
+  return copyDirectory(viewerDistDirectory, resultsDirectory, {
+    filter(stat, filepath) {
+      // Don't copy .html files
+      if (stat === 'file' && path.extname(filepath) === '.html') {
+        return false;
       }
-    );
+      return true;
+    },
   });
-};
+}
