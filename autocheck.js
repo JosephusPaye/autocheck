@@ -1,8 +1,8 @@
 const path = require('path');
 
-const performFileCheck = require('./checks/file');
-const { copySupportingFiles, createReport } = require('./report');
 const { getFileCache } = require('./fs');
+const performFileCheck = require('./check-file');
+const { copySupportingFiles, createReport } = require('./report');
 
 async function main() {
   const targetDirectories = getTargetDirectories();

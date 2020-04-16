@@ -1,7 +1,7 @@
 const url = require('url');
 const path = require('path');
 
-const { expandGlobs, readStringAndCache } = require('../fs');
+const { expandGlobs, readStringAndCache } = require('./fs');
 
 module.exports = async function performFileCheck(
   checkConfiguration,
