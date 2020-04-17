@@ -11,7 +11,6 @@ module.exports.createReport = createReport;
 module.exports.copySupportingFiles = copySupportingFiles;
 
 const viewerDistDirectory = path.join(__dirname, 'viewer', 'dist');
-const resultsDirectory = path.join(__dirname, 'results');
 
 let reportTemplate;
 async function getReportTemplate() {
@@ -30,19 +29,23 @@ async function getReportTemplate() {
   }
 }
 
-async function createReport(result) {
+async function createReport(result, resultsDirectory) {
   const template = await getReportTemplate();
   const report = template
     .replace('$TITLE', result.title)
     .replace('$REPORT', JSON.stringify(result));
 
-  return writeString(
-    path.join(resultsDirectory, result.title.trim() + '.html'),
-    report
+  const reportFilePath = path.join(
+    resultsDirectory,
+    result.title.trim() + '.html'
   );
+
+  await writeString(reportFilePath, report);
+
+  return reportFilePath;
 }
 
-async function copySupportingFiles() {
+async function copySupportingFiles(resultsDirectory) {
   await cleanContents(resultsDirectory);
   return copyDirectory(viewerDistDirectory, resultsDirectory, {
     filter(stat, filepath) {

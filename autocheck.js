@@ -11,7 +11,7 @@ async function main() {
   const checksFile = await findChecksFile();
   const checks = getChecks(checksFile);
 
-  println('running checks from ', checksFile);
+  println('running checks in: ', checksFile);
   println();
 
   const targetDirectories = getTargetDirectories();
@@ -84,7 +84,6 @@ async function main() {
     }
 
     results.push({
-      directory,
       title: path.basename(directory),
       checks: checkResults,
       fileContents: getFileCache(directory),
@@ -95,12 +94,16 @@ async function main() {
   println('generating reports...');
   println();
 
-  await copySupportingFiles();
+  const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
+  await copySupportingFiles(resultsDirectory);
 
   for (const result of results) {
-    await createReport(result);
-    println('generated report: ', result.directory);
+    const reportFilePath = await createReport(result, resultsDirectory);
+    println('generated report: ', reportFilePath);
   }
+
+  println();
+  println('done');
 }
 
 main();
@@ -111,7 +114,7 @@ function getTargetDirectories() {
     .map((directory) => path.resolve(directory)); // TODO: filter given paths to only directories
 
   if (targetDirectories.length === 0) {
-    console.log('Provide one or more target directories to check');
+    println('Provide one or more target directories to check');
     process.exit();
   }
 
@@ -136,7 +139,7 @@ function getChecks(filePath) {
   try {
     return require(filePath);
   } catch (err) {
-    console.log('Unable to read checks.json file:', err);
+    console.log('Unable to read checks file:', err);
     process.exit();
   }
 }
