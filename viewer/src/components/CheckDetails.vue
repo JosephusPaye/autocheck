@@ -36,6 +36,7 @@
           @click="$emit('select', i)"
           class="px-4 w-full truncate text-left py-2 leading-none result-item hover:bg-gray-200"
           :class="[i === selectedResultIndex ? 'is-selected' : '']"
+          :title="result"
         >
           {{ result }}
         </button>
