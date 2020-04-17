@@ -159,7 +159,7 @@ async function findChecksFile() {
   const checksFile = process.argv[2];
 
   if (!checksFile) {
-    console.log('provide a file of checks to run', checksFilePath);
+    console.log('provide a JSON file of checks to run');
     process.exit();
   }
 
