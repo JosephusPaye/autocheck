@@ -54,8 +54,8 @@ export default {
           values: [this.check.config.actual],
         },
         {
-          label: 'Match status',
-          values: [this.check.status],
+          label: 'Matches',
+          values: [this.check.status === 'passed'],
         },
       ];
     },
