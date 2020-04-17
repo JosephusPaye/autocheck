@@ -1,6 +1,6 @@
 const path = require('path');
 
-const { getFileCache } = require('./fs');
+const { getFileCache, fileExists } = require('./fs');
 const { copySupportingFiles, createReport } = require('./report');
 
 const performFileCheck = require('./check-file');
@@ -8,15 +8,23 @@ const performCommandCheck = require('./check-command');
 const performMatchCheck = require('./check-match');
 
 async function main() {
+  const checksFile = await findChecksFile();
+  const checks = getChecks(checksFile);
+
+  println('running checks from ', checksFile);
+  println();
+
   const targetDirectories = getTargetDirectories();
-  const checks = getChecks();
   const results = [];
 
   for (directory of targetDirectories) {
+    println('checking directory: ', directory);
+
     const completedCheckStatuses = {};
     const checkResults = [];
 
     for (const check of checks) {
+      println('  running check: ', check.label);
       let checkResult;
 
       if (check.if) {
@@ -39,6 +47,11 @@ async function main() {
                 dependency.status === 'skipped' ? 'was skipped' : 'failed'
               }.`,
             };
+            println(
+              `    check skipped because ${quote(check.if)} ${
+                dependency.status === 'skipped' ? 'was skipped' : 'failed'
+              }.`
+            );
           }
         } else {
           checkResult = {
@@ -48,6 +61,7 @@ async function main() {
               check.if
             )}, was not found. Make sure the referenced check exists and appears before this check.`,
           };
+          println(`    check skipped because ${quote(check.if)} was not found`);
         }
       } else {
         checkResult = await performCheck(check, directory);
@@ -59,22 +73,33 @@ async function main() {
           output: checkResult.output,
         };
         checkResults.push(checkResult);
+
+        if (checkResult.status !== 'skipped') {
+          print('    check ' + checkResult.status);
+          println(checkResult.error ? ': ' + checkResult.error : '');
+        }
+      } else {
+        println('    check has no result');
       }
     }
 
     results.push({
+      directory,
       title: path.basename(directory),
       checks: checkResults,
       fileContents: getFileCache(directory),
     });
   }
 
+  println();
+  println('generating reports...');
+  println();
+
   await copySupportingFiles();
-  console.log('copied supporting files');
 
   for (const result of results) {
     await createReport(result);
-    console.log('created report for target: ', result.title);
+    println('generated report: ', result.directory);
   }
 }
 
@@ -82,7 +107,7 @@ main();
 
 function getTargetDirectories() {
   const targetDirectories = process.argv
-    .slice(2)
+    .slice(3)
     .map((directory) => path.resolve(directory)); // TODO: filter given paths to only directories
 
   if (targetDirectories.length === 0) {
@@ -93,10 +118,23 @@ function getTargetDirectories() {
   return targetDirectories;
 }
 
-function getChecks() {
+async function findChecksFile() {
+  const checksFile = process.argv[2];
+  const checksFilePath = path.isAbsolute(checksFile)
+    ? checksFile
+    : path.join(process.cwd(), checksFile);
+
+  if (!(await fileExists(checksFilePath))) {
+    console.log('Checks file not found:', checksFilePath);
+    process.exit();
+  }
+
+  return checksFilePath;
+}
+
+function getChecks(filePath) {
   try {
-    // TODO: take checks.json path as an argument
-    return require('./checks.json');
+    return require(filePath);
   } catch (err) {
     console.log('Unable to read checks.json file:', err);
     process.exit();
@@ -116,4 +154,17 @@ async function performCheck(checkConfiguration, targetDirectory, context) {
 
 function quote(text, delimiter = '`') {
   return delimiter + text + delimiter;
+}
+
+function print(...values) {
+  for (const value of values) {
+    process.stdout.write(value);
+  }
+}
+
+function println(...values) {
+  for (const value of values) {
+    process.stdout.write(value);
+  }
+  process.stdout.write('\n');
 }
