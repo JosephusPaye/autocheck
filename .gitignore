@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
-/results
+/autocheck-reports
+/_files
 /viewer/dist
 _del
 
