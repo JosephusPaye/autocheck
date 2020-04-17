@@ -1,6 +1,12 @@
 const path = require('path');
+const yargs = require('yargs-parser');
 
-const { getFileCache, fileExists } = require('./fs');
+const {
+  getFileCache,
+  fileExists,
+  directoryExists,
+  listDirectories,
+} = require('./fs');
 const { copySupportingFiles, createReport } = require('./report');
 
 const performFileCheck = require('./check-file');
@@ -14,17 +20,22 @@ async function main() {
   println('running checks in: ', checksFile);
   println();
 
-  const targetDirectories = getTargetDirectories();
+  const targetDirectories = await getTargetDirectories();
   const results = [];
 
+  let i = 1;
   for (directory of targetDirectories) {
-    println('checking directory: ', directory);
+    println(
+      `checking directory (${i++}/${targetDirectories.length}): `,
+      directory
+    );
 
     const completedCheckStatuses = {};
     const checkResults = [];
 
+    let j = 1;
     for (const check of checks) {
-      println('  running check: ', check.label);
+      println(`  running check (${j++}/${checks.length}): `, check.label);
       let checkResult;
 
       if (check.if) {
@@ -88,6 +99,8 @@ async function main() {
       checks: checkResults,
       fileContents: getFileCache(directory),
     });
+
+    println();
   }
 
   println();
@@ -108,13 +121,34 @@ async function main() {
 
 main();
 
-function getTargetDirectories() {
-  const targetDirectories = process.argv
-    .slice(3)
-    .map((directory) => path.resolve(directory)); // TODO: filter given paths to only directories
+async function getTargetDirectories() {
+  const targetDirectories = [];
+
+  const args = yargs(process.argv.slice(3), {
+    boolean: ['subfolders'],
+  });
+
+  for (const arg of args._) {
+    const directory = path.isAbsolute(arg)
+      ? arg
+      : path.join(process.cwd(), arg);
+
+    if (await directoryExists(directory)) {
+      if (args.subfolders) {
+        const directories = await listDirectories(directory, directory, {
+          recursive: false,
+        });
+        targetDirectories.push(...directories);
+      } else {
+        targetDirectories.push(directory);
+      }
+    } else {
+      console.log('target directory not found, ignoring: ', directory);
+    }
+  }
 
   if (targetDirectories.length === 0) {
-    println('Provide one or more target directories to check');
+    println('provide one or more target directories to check');
     process.exit();
   }
 
@@ -123,12 +157,18 @@ function getTargetDirectories() {
 
 async function findChecksFile() {
   const checksFile = process.argv[2];
+
+  if (!checksFile) {
+    console.log('provide a file of checks to run', checksFilePath);
+    process.exit();
+  }
+
   const checksFilePath = path.isAbsolute(checksFile)
     ? checksFile
     : path.join(process.cwd(), checksFile);
 
   if (!(await fileExists(checksFilePath))) {
-    console.log('Checks file not found:', checksFilePath);
+    console.log('checks file not found:', checksFilePath);
     process.exit();
   }
 
@@ -139,7 +179,7 @@ function getChecks(filePath) {
   try {
     return require(filePath);
   } catch (err) {
-    console.log('Unable to read checks file:', err);
+    console.log('unable to read checks file:', err);
     process.exit();
   }
 }

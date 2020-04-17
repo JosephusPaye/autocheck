@@ -9,6 +9,7 @@ module.exports.readStringAndCache = readStringAndCache;
 module.exports.getFileCache = getFileCache;
 module.exports.writeString = writeString;
 module.exports.listFiles = listFiles;
+module.exports.listDirectories = listDirectories;
 module.exports.expandGlobs = expandGlobs;
 module.exports.cleanContents = cleanContents;
 module.exports.copyDirectory = copyDirectory;
@@ -69,6 +70,32 @@ async function listFiles(currentDirectory, rootDirectory) {
   }
 
   return files;
+}
+
+async function listDirectories(
+  currentDirectory,
+  rootDirectory,
+  options = { recursive: true }
+) {
+  const directories = [];
+  const names = (await fsReaddir(currentDirectory)) || [];
+
+  for (const name of names) {
+    const fullPath = path.join(currentDirectory, name);
+    const stat = await fsStat(fullPath);
+
+    if (stat.isDirectory()) {
+      directories.push(fullPath);
+
+      if (options.recursive) {
+        directories.push(
+          ...(await listDirectories(fullPath, rootDirectory, options))
+        );
+      }
+    }
+  }
+
+  return directories;
 }
 
 async function expandGlobs(rootDirectory, globs) {
