@@ -51,6 +51,7 @@ export default {
 <style lang="scss">
 @import './assets/tailwind.css';
 @import './assets/prism-okaidia.css';
+@import './assets/diff2html.css';
 
 body {
   color: rgba(0, 0, 0, 0.87);

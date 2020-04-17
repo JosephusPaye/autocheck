@@ -58,8 +58,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~diff2html/bundles/css/diff2html.min.css';
-
 .d2h-file-header {
   display: none;
 }
