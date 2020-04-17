@@ -65,7 +65,7 @@ module.exports = async function performCommandCheck(
       input: inputStream,
       all: true,
     });
-    const cancelTimeout = killAfterTimeout(subprocess, 7500);
+    const cancelTimeout = killAfterTimeout(subprocess, 10000);
 
     const commandResult = await subprocess;
     cancelTimeout();

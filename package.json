@@ -1,6 +1,26 @@
 {
   "name": "autocheck",
-  "private": true,
+  "description": "Automatically check for patterns against a set of files and executables, and generate a neat report to quickly examine the results.",
+  "main": "autocheck.js",
+  "version": "0.1.0",
+  "bin": {
+    "autocheck": "./autocheck.js"
+  },
+  "scripts": {
+    "prepublishOnly": "cd viewer && npm run build && cd .."
+  },
+  "files": [
+    "viewer/dist",
+    "autocheck.js",
+    "check-command.js",
+    "check-file.js",
+    "check-match.js",
+    "fs.js",
+    "LICENCE",
+    "package.json",
+    "report.js",
+    "yarn.lock"
+  ],
   "dependencies": {
     "copy-dir": "^1.2.0",
     "execa": "^4.0.0",
