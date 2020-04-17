@@ -1,5 +1,9 @@
 <template>
-  <CheckResult :label="check.config.label" :status="check.status" :error="check.error">
+  <CheckResult
+    :label="check.config.label"
+    :status="check.status"
+    :error="check.error"
+  >
     <CheckDetails
       slot="meta"
       resultLabel="Matching files"
@@ -17,14 +21,19 @@
       :current.sync="pagination.current"
     />
     <div v-if="check.results.length > 0" slot="preview">
-      <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 720px;">
+      <div
+        v-if="isImage(file.type)"
+        class="overflow-auto w-full"
+        style="height: 720px;"
+      >
         <img :src="file.url" />
       </div>
       <Prism
         v-else-if="isCode(file.type)"
         style="height: 720px; overflow-x: auto"
         :language="extensionToLanguage[file.type]"
-      >{{ getFileContent(file.relativePath) }}</Prism>
+        >{{ getFileContent(file.relativePath) }}</Prism
+      >
       <embed
         v-else-if="file.type === 'pdf'"
         scale="tofit"

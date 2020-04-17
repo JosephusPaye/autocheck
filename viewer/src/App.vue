@@ -17,6 +17,7 @@
 <script>
 import FileCheck from './components/FileCheck.vue';
 import CommandCheck from './components/CommandCheck.vue';
+import MatchCheck from './components/MatchCheck.vue';
 
 export default {
   name: 'App',
@@ -24,6 +25,7 @@ export default {
   components: {
     FileCheck,
     CommandCheck,
+    MatchCheck,
   },
 
   data() {
@@ -39,6 +41,7 @@ export default {
       checkToComponent: {
         file: 'FileCheck',
         command: 'CommandCheck',
+        match: 'MatchCheck',
       },
     };
   },

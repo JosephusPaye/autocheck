@@ -15,7 +15,12 @@
             {{ detail.label }}
           </div>
           <div class="grid gap-2 grid-cols-1">
-            <div v-for="(value, j) in detail.values" :key="j" class="font-mono">
+            <div
+              v-for="(value, j) in detail.values"
+              :key="j"
+              class="font-mono truncate"
+              :title="value"
+            >
               {{ value }}
             </div>
           </div>

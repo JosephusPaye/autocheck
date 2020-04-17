@@ -23,5 +23,12 @@
     "command": "./test.exe 0a9dufiauf",
     "runInCygwin": true,
     "cygwinBin": "C:\\Users\\jpaye\\AppData\\Local\\scoop\\apps\\cygwin\\current\\root\\bin\\"
+  },
+  {
+    "type": "match",
+    "label": "Matches Expected Output",
+    "if": "Runs",
+    "expected": "file:C:\\code\\JosephusPaye\\autocheck\\expected.txt",
+    "actual": "output:Runs"
   }
 ]

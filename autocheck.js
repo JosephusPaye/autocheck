@@ -5,6 +5,7 @@ const { copySupportingFiles, createReport } = require('./report');
 
 const performFileCheck = require('./check-file');
 const performCommandCheck = require('./check-command');
+const performMatchCheck = require('./check-match');
 
 async function main() {
   const targetDirectories = getTargetDirectories();
@@ -23,7 +24,11 @@ async function main() {
 
         if (dependency) {
           if (dependency.status === 'passed') {
-            checkResult = await performCheck(check, directory);
+            checkResult = await performCheck(
+              check,
+              directory,
+              completedCheckStatuses
+            );
           } else {
             checkResult = {
               config: check,
@@ -98,12 +103,14 @@ function getChecks() {
   }
 }
 
-async function performCheck(checkConfiguration, targetDirectory) {
+async function performCheck(checkConfiguration, targetDirectory, context) {
   switch (checkConfiguration.type) {
     case 'file':
-      return performFileCheck(checkConfiguration, targetDirectory);
+      return performFileCheck(checkConfiguration, targetDirectory, context);
     case 'command':
-      return performCommandCheck(checkConfiguration, targetDirectory);
+      return performCommandCheck(checkConfiguration, targetDirectory, context);
+    case 'match':
+      return performMatchCheck(checkConfiguration, targetDirectory, context);
   }
 }
 
