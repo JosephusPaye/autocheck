@@ -23,6 +23,9 @@ async function main() {
   const targetDirectories = await getTargetDirectories();
   const results = [];
 
+  const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
+  await copySupportingFiles(resultsDirectory);
+
   let i = 1;
   for (directory of targetDirectories) {
     println(
@@ -94,25 +97,18 @@ async function main() {
       }
     }
 
-    results.push({
+    const result = {
       title: path.basename(directory),
       checks: checkResults,
       fileContents: getFileCache(directory),
-    });
+    };
 
-    println();
-  }
+    results.push(result);
 
-  println();
-  println('generating reports...');
-  println();
-
-  const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
-  await copySupportingFiles(resultsDirectory);
-
-  for (const result of results) {
     const reportFilePath = await createReport(result, resultsDirectory);
     println('generated report: ', reportFilePath);
+
+    println();
   }
 
   println();
