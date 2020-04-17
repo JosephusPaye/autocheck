@@ -18,6 +18,7 @@
     "fs.js",
     "LICENCE",
     "package.json",
+    "README.md",
     "report.js",
     "yarn.lock"
   ],
