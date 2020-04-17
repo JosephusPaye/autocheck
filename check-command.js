@@ -55,21 +55,30 @@ module.exports = async function performCommandCheck(
     inputStream = createReadStream(input, { encoding: 'utf-8' });
   }
 
-  let output, exitCode;
+  let output, exitCode, error;
 
   try {
-    const commandResult = await execa(command[0], command.slice(1), {
+    const subprocess = execa(command[0], command.slice(1), {
       shell: true,
       localDir: directory,
       cwd: directory,
       input: inputStream,
       all: true,
     });
+    const cancelTimeout = killAfterTimeout(subprocess, 7500);
+
+    const commandResult = await subprocess;
+    cancelTimeout();
+
     output = commandResult.all;
     exitCode = commandResult.exitCode;
   } catch (err) {
     output = err.all;
     exitCode = err.exitCode || -1;
+    if (err.isCanceled) {
+      error =
+        'command cancelled after timeout. if the command expects std input, set the `input` option.';
+    }
   }
 
   return {
@@ -82,6 +91,7 @@ module.exports = async function performCommandCheck(
       exitCode,
     },
     output,
+    error,
   };
 };
 
@@ -114,4 +124,14 @@ function toCygpath(location) {
   const root = path.parse(locationPosix).root;
   const rootLetter = root.replace(':/', '/');
   return locationPosix.replace(root, `/cygdrive/${rootLetter.toLowerCase()}`);
+}
+
+function killAfterTimeout(subprocess, timeout) {
+  const t = setTimeout(() => {
+    subprocess.cancel();
+  }, timeout);
+
+  return () => {
+    clearTimeout(t);
+  };
 }
