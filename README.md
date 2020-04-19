@@ -275,7 +275,7 @@ Some notes:
 ## What's next
 
 - [ ] Record a tutorial video
-- [ ] Add screenshots to this README showing example results of each check
+- [x] Add screenshots to this README showing example results of each check
 - [ ] Add colors to the CLI output
 - [ ] Warn when commands block for stdin if there's no `input` specified
 - [ ] Add search check
