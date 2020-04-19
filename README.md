@@ -194,7 +194,7 @@ done
 
 </details>
 
-And [this report (screenshot)](./screenshot.png)
+And [this report (screenshot)](https://github.com/JosephusPaye/autocheck/raw/master/screenshot.png).
 
 ## Available Checks
 
