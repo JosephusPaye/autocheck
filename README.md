@@ -155,10 +155,10 @@ Use this check to compare two pieces of text for similarity. The texts can be pr
 
 This check supports the following configuration options:
 
-| Option     | Type   | Presence | Description                                                                                                                                                           |
-| ---------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `expected` | String | Required | The expected text. Could be a string (e.g. `"abc"`), file reference (e.g. `"file:C:\path\to\expected.txt"`), or output capture (e.g. `"output:MyRunCheck"`).          |
-| `actual`   | String | Required | The actual text. Could be a string (e.g. `"abc"`), file reference (e.g. `"file:C:\path\to\expected.txt"`), or output capture (e.g. `"output:LabelOfMyCommandCheck"`). |
+| Option     | Type   | Presence | Description                                                                                                                                                             |
+| ---------- | ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expected` | String | Required | The expected text. Could be a string (e.g. `"abc"`), file reference (e.g. `"file:C:\path\to\expected.txt"`), or output capture (e.g. `"output:LabelOfMyCommandCheck"`). |
+| `actual`   | String | Required | The actual text. Could be a string (e.g. `"abc"`), file reference (e.g. `"file:C:\path\to\expected.txt"`), or output capture (e.g. `"output:LabelOfMyCommandCheck"`).   |
 
 Some notes:
 
