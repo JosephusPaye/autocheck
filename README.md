@@ -93,6 +93,109 @@ autocheck ./checks.json "C:\\path\\to\\submissions\\" --subfolders
 
 That will run Autocheck against every subfolder in `C:\path\to\submissions\`, e.g. `C:\path\to\submissions\JohnDoe\`, `C:\path\to\submissions\JaneDoe\`, etc.
 
+## Example
+
+Given the following files in `C:\code\JosephusPaye\SENG1120-Assignment-1`:
+
+<details>
+<summary>Show files</summary>
+
+```
+C:\code\JosephusPaye\SENG1120-Assignment-1\
+|-- Assignment Cover Sheet.pdf
+|-- DeckOfCards.cpp
+|-- DeckOfCards.h
+|-- DeckOfCardsDemo.cpp
+|-- LinkedList.cpp
+|-- LinkedList.h
+|-- Makefile
+|-- Node.cpp
+|-- Node.h
+`-- readme.txt
+```
+
+</details>
+
+And the following `checks.json` file:
+
+<details>
+<summary>Show checks.json</summary>
+
+```json
+[
+  {
+    "type": "file",
+    "label": "Cover Sheet and Readme",
+    "patterns": ["**/*.pdf", "**/*.{jpg,jpeg,png}", "**/*.{txt,md}"]
+  },
+  {
+    "type": "file",
+    "label": "Code Files",
+    "patterns": ["**/*.h", "**/*.cpp", "**/makefile"]
+  },
+  {
+    "type": "command",
+    "label": "Compiles",
+    "command": "make clean && make",
+    "runInCygwin": true,
+    "cygwinBin": "C:\\Users\\jpaye\\AppData\\Local\\scoop\\apps\\cygwin\\current\\root\\bin\\"
+  },
+  {
+    "type": "command",
+    "label": "Runs",
+    "if": "Compiles",
+    "command": "./test.exe my-random-seed",
+    "runInCygwin": true,
+    "cygwinBin": "C:\\Users\\jpaye\\AppData\\Local\\scoop\\apps\\cygwin\\current\\root\\bin\\"
+  },
+  {
+    "type": "match",
+    "label": "Matches Expected Output",
+    "if": "Runs",
+    "expected": "file:C:\\code\\JosephusPaye\\autocheck\\example\\expected.txt",
+    "actual": "output:Runs"
+  }
+]
+```
+
+</details>
+
+Running Autocheck as follows:
+
+```sh
+autocheck checks.json "C:\\code\\JosephusPaye\\SENG1120-Assignment-1"
+```
+
+Produces the following output:
+
+<details>
+<summary>Show output</summary>
+
+```
+C:\code\JosephusPaye\autocheck\example
+> autocheck checks.json "C:\\code\\JosephusPaye\\SENG1120-Assignment-1"
+running checks in: C:\code\JosephusPaye\autocheck\example\checks.json
+
+checking directory (1/1): C:\code\JosephusPaye\SENG1120-Assignment-1
+  running check (1/5): Cover Sheet and Readme
+    check passed
+  running check (2/5): Code Files
+    check passed
+  running check (3/5): Compiles
+    check passed
+  running check (4/5): Runs
+    check passed
+  running check (5/5): Matches Expected Output
+    check failed
+generated report: C:\code\JosephusPaye\autocheck\example\autocheck-reports\SENG1120-Assignment-1.html
+
+done
+```
+
+</details>
+
+And [this report (screenshot)](./screenshot.png)
+
 ## Available Checks
 
 ### Common options
