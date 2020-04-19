@@ -12,6 +12,10 @@ With Autocheck, you can automatically run checks that:
 - Execute commands (with an input file for stdin), and embed the output in the report. Use this to compile and run code. It even supports running commands in [Cygwin](https://cygwin.com/) on Windows.
 - Compare files or output from commands against an expected result, and show any differences in the report. Use this to compare the output of student code to some expected standard.
 
+---
+
+This project is part of [#CreateWeekly](https://twitter.com/JosephusPaye/status/1214853295023411200), my attempt to create something new publicly every week in 2020.
+
 ## Installation
 
 Autocheck is a Node.js package, so you'll need [Node](https://nodejs.org/en/) and npm installed (npm comes with node).
