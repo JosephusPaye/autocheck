@@ -24,7 +24,7 @@ module.exports = async function performFileCheck(
       relativePath: file.relativePath,
     };
 
-    if (isCode(result.type)) {
+    if (isText(result.type)) {
       await readStringAndCache(file.path, file.relativePath, targetDirectory);
     }
 
@@ -39,8 +39,23 @@ module.exports = async function performFileCheck(
   };
 };
 
-function isCode(extension) {
-  return ['txt', 'md', 'c', 'cpp', 'h', 'hpp', 'makefile', 'java'].includes(
-    extension
-  );
+function isText(extension) {
+  return [
+    'txt',
+    'md',
+    'c',
+    'cpp',
+    'cs',
+    'h',
+    'hpp',
+    'makefile',
+    'java',
+    'py',
+    'html',
+    'css',
+    'js',
+    'json',
+    'xml',
+    'svg',
+  ].includes(extension);
 }

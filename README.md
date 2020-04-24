@@ -178,7 +178,7 @@ Produces the following output:
 ```
 C:\code\JosephusPaye\autocheck\example
 > autocheck checks.json "C:\\code\\JosephusPaye\\SENG1120-Assignment-1"
-running checks in: C:\code\JosephusPaye\autocheck\example\checks.json
+running checks from C:\code\JosephusPaye\autocheck\example\checks.json
 
 checking directory (1/1): C:\code\JosephusPaye\SENG1120-Assignment-1
   running check (1/5): Cover Sheet and Readme
@@ -228,13 +228,21 @@ Files with the following extensions can be embedded. Files marked as **highlight
 - `.jpg` and `.jpeg`
 - `.png`
 - `.txt`
-- `.md` (highlighted)
-- `.c` (highlighted)
-- `.cpp` (highlighted)
-- `.h` (highlighted)
-- `.hpp` (highlighted)
+- `md` (highlighted)
+- `c` (highlighted)
+- `cpp` (highlighted)
+- `cs` (highlighted)
+- `h` (highlighted)
+- `hpp` (highlighted)
 - `makefile` (highlighted)
-- `.java` (highlighted)
+- `java` (highlighted)
+- `py` (highlighted)
+- `html` (highlighted)
+- `css` (highlighted)
+- `js` (highlighted)
+- `json` (highlighted)
+- `xml` (highlighted)
+- `svg` (highlighted)
 
 ### Command check
 
