@@ -19,7 +19,7 @@ async function main() {
   const checksFile = await findChecksFile();
   const checks = getChecks(checksFile);
 
-  println('running checks in: ', checksFile);
+  println('running checks from ', checksFile);
   println();
 
   const targetDirectories = await getTargetDirectories();
@@ -113,7 +113,6 @@ async function main() {
     println();
   }
 
-  println();
   println('done');
 }
 
