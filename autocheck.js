@@ -14,6 +14,7 @@ const { copySupportingFiles, createReport } = require('./report');
 const performFileCheck = require('./check-file');
 const performCommandCheck = require('./check-command');
 const performMatchCheck = require('./check-match');
+const performSearchCheck = require('./check-search');
 
 async function main() {
   const checksFile = await findChecksFile();
@@ -189,6 +190,8 @@ async function performCheck(checkConfiguration, targetDirectory, context) {
       return performCommandCheck(checkConfiguration, targetDirectory, context);
     case 'match':
       return performMatchCheck(checkConfiguration, targetDirectory, context);
+    case 'search':
+      return performSearchCheck(checkConfiguration, targetDirectory, context);
   }
 }
 

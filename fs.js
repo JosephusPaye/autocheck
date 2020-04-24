@@ -41,7 +41,7 @@ async function readStringAndCache(filePath, key, namespace) {
     fileCache[namespace][key] = content;
   }
 
-  return key;
+  return content;
 }
 
 function getFileCache(namespace) {

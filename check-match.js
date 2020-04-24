@@ -2,7 +2,7 @@ const path = require('path');
 
 const { fileExists, readString } = require('./fs');
 
-module.exports = async function performCommandCheck(
+module.exports = async function performMatchCheck(
   checkConfiguration,
   targetDirectory,
   context
