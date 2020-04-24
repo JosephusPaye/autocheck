@@ -3,6 +3,7 @@ const path = require('path');
 const picomatch = require('picomatch');
 const rimraf = require('rimraf');
 const copydir = require('copy-dir');
+const upath = require('upath');
 
 module.exports.readString = readString;
 module.exports.readStringAndCache = readStringAndCache;
@@ -11,7 +12,7 @@ module.exports.writeString = writeString;
 module.exports.listFiles = listFiles;
 module.exports.listDirectories = listDirectories;
 module.exports.expandGlobs = expandGlobs;
-module.exports.cleanContents = cleanContents;
+module.exports.cleanDirectoryContent = cleanDirectoryContent;
 module.exports.copyDirectory = copyDirectory;
 module.exports.fileExists = fileExists;
 module.exports.directoryExists = directoryExists;
@@ -64,7 +65,9 @@ async function listFiles(currentDirectory, rootDirectory) {
     } else {
       files.push({
         path: filePath,
-        relativePath: filePath.replace(rootDirectory + path.sep, ''),
+        relativePath: upath
+          .toUnix(filePath)
+          .replace(upath.toUnix(path.join(rootDirectory, path.sep)), ''),
       });
     }
   }
@@ -108,7 +111,7 @@ async function expandGlobs(rootDirectory, globs) {
   });
 }
 
-async function cleanContents(directory) {
+async function cleanDirectoryContent(directory) {
   return rimrafPromised(path.join(directory, '*'));
 }
 

@@ -3,7 +3,7 @@ const path = require('path');
 const {
   readString,
   writeString,
-  cleanContents,
+  cleanDirectoryContent,
   copyDirectory,
 } = require('./fs');
 
@@ -46,7 +46,7 @@ async function createReport(result, resultsDirectory) {
 }
 
 async function copySupportingFiles(resultsDirectory) {
-  await cleanContents(resultsDirectory);
+  await cleanDirectoryContent(resultsDirectory);
   return copyDirectory(viewerDistDirectory, resultsDirectory, {
     filter(stat, filepath) {
       // Don't copy .html files

@@ -109,8 +109,8 @@ function makeCygwinCommand(command, directory, cygwinBin) {
   const updatePath = 'export PATH=/usr/local/bin:/usr/bin:$PATH';
   const changeDirectory = `cd \\"${toCygpath(directory)}\\"`;
 
-  // TODO: escape `command` for use in the double quotes,
-  // or document that double quotes should be escaped
+  // TODO: escape `command` for use in the double quotes
+  // (so the user doesn't have to do that manually)
   const bashCommand = [
     '-c',
     `"${updatePath} && ${changeDirectory} && ${command}"`,
