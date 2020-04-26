@@ -2,8 +2,6 @@
 
 ✅ Autocheck is a command-line tool that allows you to automatically check for patterns against a set of files and executables, and generate a neat report to quickly examine the results. It can be a very useful aid when marking programming assignments.
 
-<!-- ![Promotional image showing an autocheck report](./promo.png) -->
-
 Autocheck is not an auto-grader or auto-marker, and has no special understanding of the files it processes, or the commands it runs. Instead, it provides a simple framework for automating many of the manual checks that are involved with marking programming assignments. You use it by configuring a series of checks in a JSON file, and then running those checks against one or more target directories. The results are automatically consolidated into neat reports that are optimised for scanning, to save you time.
 
 With Autocheck, you can automatically run checks that:
@@ -25,6 +23,14 @@ Run the following to install Autocheck:
 ```
 npm install -g autocheck
 ```
+
+## Tutorial
+
+Learn how to use Autocheck to mark a programming assignment:
+
+<a href="https://www.youtube.com/watch?v=lsQ4lIbZk-Y" target="_blank">
+  <img alt="Autocheck tutorial video thumbnail" src="./tutorial-thumbnail.png" width="380px">
+</a>
 
 ## Usage
 
