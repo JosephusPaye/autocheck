@@ -9,7 +9,11 @@ const {
   directoryExists,
   listDirectories,
 } = require('./fs');
-const { copySupportingFiles, createReport } = require('./report');
+const {
+  copySupportingFiles,
+  createReport,
+  generateReportsIndex,
+} = require('./report');
 
 const performFileCheck = require('./check-file');
 const performCommandCheck = require('./check-command');
@@ -111,6 +115,17 @@ async function main() {
     const reportFilePath = await createReport(result, resultsDirectory);
     println('generated report: ', reportFilePath);
 
+    println();
+  }
+
+  if (results.length > 0) {
+    println('generating index...');
+
+    generateReportsIndex(resultsDirectory);
+
+    println(
+      `open ${path.join(resultsDirectory, 'index.html')} in a browser to view reports`
+    );
     println();
   }
 
