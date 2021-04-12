@@ -1,3 +1,5 @@
+// @ts-check
+
 const url = require('url');
 const path = require('path');
 

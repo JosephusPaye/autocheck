@@ -1,3 +1,5 @@
+// @ts-check
+
 const fs = require('fs');
 const path = require('path');
 const picomatch = require('picomatch');
@@ -103,9 +105,8 @@ async function listDirectories(
 
 async function expandGlobs(rootDirectory, globs) {
   const files = await listFiles(rootDirectory, rootDirectory);
-  const isMatch = picomatch(globs, {
-    nocase: true,
-  });
+  const isMatch = picomatch(globs);
+
   return files.filter((file) => {
     return isMatch(file.relativePath);
   });

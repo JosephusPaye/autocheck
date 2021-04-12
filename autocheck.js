@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// @ts-check
+
 const path = require('path');
 const yargs = require('yargs-parser');
 
@@ -34,7 +36,7 @@ async function main() {
   await copySupportingFiles(resultsDirectory);
 
   let i = 1;
-  for (directory of targetDirectories) {
+  for (let directory of targetDirectories) {
     println(
       `checking directory (${i++}/${targetDirectories.length}): `,
       directory
@@ -200,13 +202,13 @@ function getChecks(filePath) {
 async function performCheck(checkConfiguration, targetDirectory, context) {
   switch (checkConfiguration.type) {
     case 'file':
-      return performFileCheck(checkConfiguration, targetDirectory, context);
+      return performFileCheck(checkConfiguration, targetDirectory);
     case 'command':
-      return performCommandCheck(checkConfiguration, targetDirectory, context);
+      return performCommandCheck(checkConfiguration, targetDirectory);
     case 'match':
       return performMatchCheck(checkConfiguration, targetDirectory, context);
     case 'search':
-      return performSearchCheck(checkConfiguration, targetDirectory, context);
+      return performSearchCheck(checkConfiguration, targetDirectory);
   }
 }
 

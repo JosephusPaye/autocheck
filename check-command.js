@@ -1,3 +1,5 @@
+// @ts-check
+
 const path = require('path');
 const upath = require('upath');
 const execa = require('execa');
