@@ -1,7 +1,5 @@
-#!/usr/bin/env node
-
 import path from 'path';
-import yargs from 'yargs-parser';
+import color from 'kleur';
 
 import { performFileCheck, FileCheckConfiguration, FileCheckResult } from './checks/file-check';
 import {
@@ -46,14 +44,18 @@ export interface Result {
   fileContents: Record<string, string>;
 }
 
-async function main() {
-  const checksFile = await findChecksFile();
+export async function main(
+  checksFileArg: string,
+  targetDirectoryArgs: string[],
+  useSubfolders: boolean
+) {
+  const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
 
-  println('running checks from ', checksFile);
+  println(color.yellow(`running checks from ${checksFile}`));
   println();
 
-  const targetDirectories = await getTargetDirectories();
+  const targetDirectories = await resolveTargetDirectories(targetDirectoryArgs, useSubfolders);
   const results: Result[] = [];
 
   const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
@@ -61,7 +63,7 @@ async function main() {
 
   let i = 1;
   for (let directory of targetDirectories) {
-    println(`checking directory (${i++}/${targetDirectories.length}): `, directory);
+    println(color.yellow(`checking directory (${i++}/${targetDirectories.length}): ${directory}`));
 
     const completedChecks: CompletedChecksStatus = new Map();
     const checkResults: CommonCheckResult[] = [];
@@ -88,9 +90,11 @@ async function main() {
             };
 
             println(
-              `    check skipped because ${quote(check.if)} ${
-                dependency.status === 'skipped' ? 'was skipped' : 'failed'
-              }.`
+              color.gray(
+                `    check skipped because ${quote(check.if)} ${
+                  dependency.status === 'skipped' ? 'was skipped' : 'failed'
+                }.`
+              )
             );
           }
         } else {
@@ -102,7 +106,7 @@ async function main() {
             )}, was not found. Make sure the referenced check exists and appears before this check.`,
           };
 
-          println(`    check skipped because ${quote(check.if)} was not found`);
+          println(color.gray(`    check skipped because ${quote(check.if)} was not found`));
         }
       } else {
         checkResult = await performCheck(check, directory, completedChecks);
@@ -116,12 +120,14 @@ async function main() {
 
         checkResults.push(checkResult);
 
-        if (checkResult.status !== 'skipped') {
-          print('    check ' + checkResult.status);
+        if (checkResult.status === 'passed') {
+          println(color.green('    check ' + checkResult.status));
+        } else if (checkResult.status === 'failed') {
+          print(color.red('    check failed'));
           println(checkResult.error ? ': ' + checkResult.error : '');
         }
       } else {
-        println('    check has no result');
+        println(color.gray('    check has no result'));
       }
     }
 
@@ -134,38 +140,30 @@ async function main() {
     results.push(result);
 
     const reportFilePath = await createReport(result, resultsDirectory);
-    println('generated report: ', reportFilePath);
+    println('  generated report: ', reportFilePath);
 
     println();
   }
 
   if (results.length > 0) {
-    println('generating index...');
-    println();
-
+    println(color.yellow(`generating index at ${path.join(resultsDirectory, 'index.html')} ...`));
     generateReportsIndex(resultsDirectory);
 
-    println(`open ${path.join(resultsDirectory, 'index.html')} in a browser to view reports`);
+    println(`  open in a browser to view reports`);
     println();
   }
 
-  println('done');
+  println(color.yellow('done'));
 }
 
-main();
-
-async function getTargetDirectories() {
+async function resolveTargetDirectories(targetDirectoryArgs: string[], useSubfolders: boolean) {
   const targetDirectories = [];
 
-  const args = yargs(process.argv.slice(3), {
-    boolean: ['subfolders'],
-  });
-
-  for (const arg of args._) {
+  for (const arg of targetDirectoryArgs) {
     const directory = path.isAbsolute(arg) ? arg : path.join(process.cwd(), arg);
 
     if (await directoryExists(directory)) {
-      if (args.subfolders) {
+      if (useSubfolders) {
         const directories = await listDirectories(directory, directory, {
           recursive: false,
         });
@@ -174,36 +172,24 @@ async function getTargetDirectories() {
         targetDirectories.push(directory);
       }
     } else {
-      console.log('target directory not found, ignoring: ', directory);
+      console.log('target directory not found, skipping: ', directory);
     }
-  }
-
-  if (targetDirectories.length === 0) {
-    println('provide one or more target directories to check');
-    process.exit();
   }
 
   return targetDirectories;
 }
 
-async function findChecksFile() {
-  const checksFile = process.argv[2];
+async function findChecksFile(checksFilePath: string) {
+  const resolvedChecksFilePath = path.isAbsolute(checksFilePath)
+    ? checksFilePath
+    : path.join(process.cwd(), checksFilePath);
 
-  if (!checksFile) {
-    console.log('provide a JSON file of checks to run');
+  if (!(await fileExists(resolvedChecksFilePath))) {
+    console.log('checks file not found:', resolvedChecksFilePath);
     process.exit();
   }
 
-  const checksFilePath = path.isAbsolute(checksFile)
-    ? checksFile
-    : path.join(process.cwd(), checksFile);
-
-  if (!(await fileExists(checksFilePath))) {
-    console.log('checks file not found:', checksFilePath);
-    process.exit();
-  }
-
-  return checksFilePath;
+  return resolvedChecksFilePath;
 }
 
 function getChecks(filePath: string): ChecksConfiguration {
