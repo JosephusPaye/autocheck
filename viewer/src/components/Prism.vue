@@ -1,8 +1,8 @@
 <template>
   <pre
-    :class="preClass"
+    :class="{ 'line-numbers': showLineNumbers }"
     :data-line="highlightLines"
-  ><code ref="code" :class="codeClass"></code><slot></slot></pre>
+  ><code ref="code" :class="[`language-${language}`]"></code><slot></slot></pre>
 </template>
 
 <script>
@@ -24,7 +24,7 @@ require('prismjs/plugins/line-highlight/prism-line-highlight');
 
 export default {
   props: {
-    language: {
+    fileExtension: {
       type: String,
       default: 'javascript',
     },
@@ -42,17 +42,32 @@ export default {
     },
   },
 
-  computed: {
-    preClass() {
-      return {
-        'line-numbers': this.showLineNumbers,
-      };
-    },
+  data() {
+    return {
+      extensionToLanguage: {
+        txt: 'none', // no highlighting
+        md: 'markdown',
+        c: 'c',
+        cpp: 'cpp',
+        cs: 'csharp',
+        h: 'cpp',
+        hpp: 'cpp',
+        makefile: 'makefile',
+        java: 'java',
+        py: 'python',
+        html: 'markup',
+        css: 'css',
+        js: 'javascript',
+        json: 'json',
+        xml: 'markup',
+        svg: 'markup',
+      },
+    };
+  },
 
-    codeClass() {
-      return {
-        [`language-${this.language}`]: true,
-      };
+  computed: {
+    language() {
+      return this.extensionToLanguage[this.fileExtension] ?? 'none';
     },
   },
 

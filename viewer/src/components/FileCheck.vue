@@ -30,11 +30,12 @@
       >
         <img :src="file.url" />
       </div>
-      <CodeBlock
+      <Prism
         v-else-if="isText(file.type)"
         style="height: 720px; overflow-x: auto"
         :fileExtension="file.type"
         :code="getFileContent(file.relativePath)"
+        highlightLines="4-5,13-18"
       />
       <embed
         v-else-if="file.type === 'pdf'"
@@ -74,7 +75,7 @@
 </template>
 
 <script>
-import CodeBlock from './CodeBlock.vue';
+import Prism from './Prism.vue';
 import CheckResult from './CheckResult.vue';
 import CheckPagination from './CheckPagination.vue';
 import CheckDetails from './CheckDetails.vue';
@@ -86,7 +87,7 @@ export default {
     CheckResult,
     CheckPagination,
     CheckDetails,
-    CodeBlock,
+    Prism,
   },
 
   props: {
