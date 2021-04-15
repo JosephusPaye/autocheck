@@ -1,10 +1,41 @@
 <template>
-  <div class="flex flex-col h-full overflow-y-auto">
-    <div class="capitalize bg-gray-300 px-4 py-2 font-semibold rounded-t">
-      {{ type }}
-      <span class="lowercase">check</span>
+  <div
+    class="flex flex-col h-full overflow-y-auto"
+    :style="{ width: !expanded ? '32px' : undefined }"
+  >
+    <div
+      class="flex capitalize bg-gray-300 px-4 py-2 font-semibold rounded-t"
+      :class="{ 'h-full rounded-b': !expanded }"
+    >
+      <span v-show="expanded"
+        >{{ type }} <span class="lowercase">check</span></span
+      >
+      <button
+        :class="[expanded ? 'ml-auto -mr-2' : '-ml-3']"
+        :title="expanded ? 'Collapse' : 'Expand'"
+        @click="toggle"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-chevron-left"
+          :style="{ transform: expanded ? 'rotateY(0)' : 'rotateY(180deg)' }"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
     </div>
-    <div class="border border-gray-300 border-t-0 rounded-b flex-grow">
+    <div
+      class="border border-gray-300 border-t-0 rounded-b flex-grow"
+      v-show="expanded"
+    >
       <div v-if="details" class="p-4 border-b border-gray-300">
         <div
           v-for="(detail, i) in details"
@@ -59,6 +90,13 @@ export default {
     resultLabelEmpty: String,
     results: Array,
     selectedResultIndex: Number,
+    expanded: Boolean,
+  },
+
+  methods: {
+    toggle() {
+      this.$emit('update:expanded', !this.expanded);
+    },
   },
 };
 </script>

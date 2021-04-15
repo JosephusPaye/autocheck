@@ -3,8 +3,14 @@
     :label="check.config.label"
     :status="check.status"
     :error="check.error"
+    :sidebarExpanded="sidebarExpanded"
   >
-    <CheckDetails slot="meta" :type="check.config.type" :details="details" />
+    <CheckDetails
+      slot="meta"
+      :type="check.config.type"
+      :details="details"
+      :expanded.sync="sidebarExpanded"
+    />
     <div v-if="check.result" slot="preview">
       <pre
         class="overflow-auto w-full language-plain"
@@ -29,6 +35,12 @@ export default {
 
   props: {
     check: Object,
+  },
+
+  data() {
+    return {
+      sidebarExpanded: true,
+    };
   },
 
   computed: {

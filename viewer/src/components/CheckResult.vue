@@ -86,10 +86,13 @@
       </div>
     </div>
     <div class="container px-4 pt-4 pb-8 mx-auto flex" v-show="expanded">
-      <div class="w-1/3 pr-6" v-if="$slots.meta">
+      <div
+        :class="[sidebarExpanded ? 'w-1/3 pr-6' : 'pr-3']"
+        v-if="$slots.meta"
+      >
         <slot name="meta"></slot>
       </div>
-      <div class="w-2/3">
+      <div :class="[sidebarExpanded ? 'w-2/3' : 'w-full min-w-0']">
         <div
           v-if="error"
           class="flex flex-col h-full w-full border rounded justify-center items-center"
@@ -136,6 +139,7 @@ export default {
     label: String,
     status: String,
     error: String,
+    sidebarExpanded: Boolean,
   },
 
   data() {

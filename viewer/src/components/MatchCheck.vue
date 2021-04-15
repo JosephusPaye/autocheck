@@ -3,8 +3,14 @@
     :label="check.config.label"
     :status="check.status"
     :error="check.error"
+    :sidebarExpanded="sidebarExpanded"
   >
-    <CheckDetails slot="meta" :type="check.config.type" :details="details" />
+    <CheckDetails
+      slot="meta"
+      :type="check.config.type"
+      :details="details"
+      :expanded.sync="sidebarExpanded"
+    />
     <div slot="preview" v-if="check.actual">
       <Diff
         v-if="check.status === 'failed'"
@@ -40,6 +46,12 @@ export default {
 
   props: {
     check: Object,
+  },
+
+  data() {
+    return {
+      sidebarExpanded: true,
+    };
   },
 
   computed: {

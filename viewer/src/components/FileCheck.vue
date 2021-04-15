@@ -3,6 +3,7 @@
     :label="check.config.label"
     :status="check.status"
     :error="check.error"
+    :sidebarExpanded="sidebarExpanded"
   >
     <CheckDetails
       slot="meta"
@@ -12,6 +13,7 @@
       :details="details"
       :results="results"
       :selectedResultIndex="pagination.current - 1"
+      :expanded.sync="sidebarExpanded"
       @select="onResultSelect"
     />
     <CheckPagination
@@ -106,12 +108,13 @@ export default {
 
   data() {
     return {
+      sidebarExpanded: true,
       pagination: {
         current: 1,
         total: this.check.results.length,
       },
       extensionToLanguage: {
-        txt: 'none',
+        txt: undefined, // no highlighting
         md: 'markdown',
         c: 'c',
         cpp: 'cpp',
@@ -200,10 +203,6 @@ pre[class*='language-'] {
 pre[class*='language-'],
 code[class*='language-'] {
   @apply font-mono;
-  font-size: 14px;
-
-  @screen md {
-    font-size: 1em;
-  }
+  font-size: 14px !important;
 }
 </style>
