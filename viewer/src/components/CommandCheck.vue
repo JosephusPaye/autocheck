@@ -89,12 +89,10 @@ export default {
       const { result, output: outputText, config } = this.check;
 
       const directoryIndicator = `<span class="token string">${result.directory}</span>`;
-      const prompt = `<span class="token keyword">&gt;</span> ${
-        config.command
-      } ${config.input ? '< ' + config.input : ''}`;
-      const output = `<span class="token ${
-        this.successful ? '' : 'deleted'
-      }">${outputText}</span>`;
+      const prompt = `<span class="token keyword">&gt;</span> ${config.command} ${
+        config.input ? '< ' + config.input : ''
+      }`;
+      const output = `<span class="token ${this.successful ? '' : 'deleted'}">${outputText}</span>`;
       return directoryIndicator + '\n' + prompt + '\n' + output;
     },
   },

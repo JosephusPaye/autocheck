@@ -2,10 +2,7 @@
   <div>
     <div class="border-t border-gray-600 bg-gray-800 text-white">
       <div class="container px-4 py-3 leading-none mx-auto flex items-center">
-        <div
-          :title="tooltips[status] || 'Check result partial or unknown'"
-          class="mr-3"
-        >
+        <div :title="tooltips[status] || 'Check result partial or unknown'" class="mr-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -86,16 +83,13 @@
       </div>
     </div>
     <div class="container px-4 pt-4 pb-8 mx-auto flex" v-show="expanded">
-      <div
-        :class="[sidebarExpanded ? 'w-1/3 pr-6' : 'pr-3']"
-        v-if="$slots.meta"
-      >
+      <div :class="[sidebarExpanded ? 'w-1/3 pr-6' : 'pr-3']" v-if="$slots.meta">
         <slot name="meta"></slot>
       </div>
       <div :class="[sidebarExpanded ? 'w-2/3' : 'w-full min-w-0']">
         <div
           v-if="error"
-          class="flex flex-col h-full w-full border rounded justify-center items-center"
+          class="flex flex-col h-full w-full border rounded justify-center items-center p-6"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

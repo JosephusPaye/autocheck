@@ -23,11 +23,7 @@
       :current.sync="pagination.current"
     />
     <div v-if="check.results.length > 0" slot="preview">
-      <div
-        v-if="isImage(file.type)"
-        class="overflow-auto w-full"
-        style="height: 720px;"
-      >
+      <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 720px;">
         <img :src="file.url" />
       </div>
       <Prism
@@ -35,7 +31,6 @@
         style="height: 720px; overflow-x: auto"
         :fileExtension="file.type"
         :code="getFileContent(file.relativePath)"
-        highlightLines="4-5,13-18"
       />
       <embed
         v-else-if="file.type === 'pdf'"
@@ -61,14 +56,10 @@
           stroke-linejoin="round"
           class="text-gray-600"
         >
-          <path
-            d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
-          />
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
           <polyline points="13 2 13 9 20 9" />
         </svg>
-        <span class="mt-3 text-lg text-gray-700"
-          >This file can't be embedded.</span
-        >
+        <span class="mt-3 text-lg text-gray-700">This file can't be embedded.</span>
       </div>
     </div>
   </CheckResult>

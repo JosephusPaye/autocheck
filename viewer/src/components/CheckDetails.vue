@@ -7,9 +7,7 @@
       class="flex capitalize bg-gray-300 px-4 py-2 font-semibold rounded-t"
       :class="{ 'h-full rounded-b': !expanded }"
     >
-      <span v-show="expanded"
-        >{{ type }} <span class="lowercase">check</span></span
-      >
+      <span v-show="expanded">{{ type }} <span class="lowercase">check</span></span>
       <button
         :class="[expanded ? 'ml-auto -mr-2' : '-ml-3']"
         :title="expanded ? 'Collapse' : 'Expand'"
@@ -32,16 +30,9 @@
         </svg>
       </button>
     </div>
-    <div
-      class="border border-gray-300 border-t-0 rounded-b flex-grow"
-      v-show="expanded"
-    >
+    <div class="border border-gray-300 border-t-0 rounded-b flex-grow" v-show="expanded">
       <div v-if="details" class="p-4 border-b border-gray-300">
-        <div
-          v-for="(detail, i) in details"
-          :key="i"
-          class="grid gap-3 detail leading-none"
-        >
+        <div v-for="(detail, i) in details" :key="i" class="grid gap-3 detail leading-none">
           <div class="text-sm uppercase tracking-wider text-gray-700 truncate">
             {{ detail.label }}
           </div>

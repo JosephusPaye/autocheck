@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col">
     <div class="ml-auto mb-2">
-      <ToggleButton id="line-by-line" :value.sync="display"
-        >Unified</ToggleButton
-      >
+      <ToggleButton id="line-by-line" :value.sync="display">Unified</ToggleButton>
       <ToggleButton id="side-by-side" :value.sync="display">Split</ToggleButton>
     </div>
     <div v-html="diff"></div>
