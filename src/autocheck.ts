@@ -1,26 +1,50 @@
 #!/usr/bin/env node
 
-// @ts-check
+import path from 'path';
+import yargs from 'yargs-parser';
 
-const path = require('path');
-const yargs = require('yargs-parser');
+import { performFileCheck, FileCheckConfiguration, FileCheckResult } from './checks/file-check';
+import {
+  performCommandCheck,
+  CommandCheckConfiguration,
+  CommandCheckResult,
+} from './checks/command-check';
+import { performMatchCheck, MatchCheckConfiguration, MatchCheckResult } from './checks/match-check';
 
-const {
-  getFileCache,
-  fileExists,
-  directoryExists,
-  listDirectories,
-} = require('./fs');
-const {
-  copySupportingFiles,
-  createReport,
-  generateReportsIndex,
-} = require('./report');
+import { print, println } from './util/console';
+import { getFileCache, fileExists, directoryExists, listDirectories } from './util/fs';
+import { quote } from './util/string';
 
-const performFileCheck = require('./check-file');
-const performCommandCheck = require('./check-command');
-const performMatchCheck = require('./check-match');
-const performSearchCheck = require('./check-search');
+import { copySupportingFiles, createReport, generateReportsIndex } from './report/report';
+
+export interface CommonCheckConfiguration {
+  type: 'file' | 'command' | 'match';
+  label: string;
+  if?: string;
+}
+
+export interface CommonCheckResult {
+  config: CheckConfiguration;
+  status: 'passed' | 'failed' | 'skipped';
+  error?: string;
+  output?: string;
+}
+
+export type ChecksConfiguration = CheckConfiguration[];
+export type CompletedChecksStatus = Map<string, Pick<CommonCheckResult, 'status' | 'output'>>;
+
+export type CheckResult = FileCheckResult | CommandCheckResult | MatchCheckResult;
+
+export type CheckConfiguration =
+  | FileCheckConfiguration
+  | CommandCheckConfiguration
+  | MatchCheckConfiguration;
+
+export interface Result {
+  title: string;
+  checks: CommonCheckResult[];
+  fileContents: Record<string, string>;
+}
 
 async function main() {
   const checksFile = await findChecksFile();
@@ -30,46 +54,39 @@ async function main() {
   println();
 
   const targetDirectories = await getTargetDirectories();
-  const results = [];
+  const results: Result[] = [];
 
   const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
   await copySupportingFiles(resultsDirectory);
 
   let i = 1;
   for (let directory of targetDirectories) {
-    println(
-      `checking directory (${i++}/${targetDirectories.length}): `,
-      directory
-    );
+    println(`checking directory (${i++}/${targetDirectories.length}): `, directory);
 
-    const completedCheckStatuses = {};
-    const checkResults = [];
+    const completedChecks: CompletedChecksStatus = new Map();
+    const checkResults: CommonCheckResult[] = [];
 
     let j = 1;
     for (const check of checks) {
       println(`  running check (${j++}/${checks.length}): `, check.label);
-      let checkResult;
+
+      let checkResult: CommonCheckResult;
 
       if (check.if) {
-        const dependency = completedCheckStatuses[check.if];
+        const dependency = completedChecks.get(check.if);
 
         if (dependency) {
           if (dependency.status === 'passed') {
-            checkResult = await performCheck(
-              check,
-              directory,
-              completedCheckStatuses
-            );
+            checkResult = await performCheck(check, directory, completedChecks);
           } else {
             checkResult = {
               config: check,
               status: 'skipped',
-              error: `Check skipped because the check it depends on, ${quote(
-                check.if
-              )}, ${
+              error: `Check skipped because the check it depends on, ${quote(check.if)}, ${
                 dependency.status === 'skipped' ? 'was skipped' : 'failed'
               }.`,
             };
+
             println(
               `    check skipped because ${quote(check.if)} ${
                 dependency.status === 'skipped' ? 'was skipped' : 'failed'
@@ -84,17 +101,19 @@ async function main() {
               check.if
             )}, was not found. Make sure the referenced check exists and appears before this check.`,
           };
+
           println(`    check skipped because ${quote(check.if)} was not found`);
         }
       } else {
-        checkResult = await performCheck(check, directory);
+        checkResult = await performCheck(check, directory, completedChecks);
       }
 
       if (checkResult) {
-        completedCheckStatuses[check.label] = {
+        completedChecks.set(check.label, {
           status: checkResult.status,
           output: checkResult.output,
-        };
+        });
+
         checkResults.push(checkResult);
 
         if (checkResult.status !== 'skipped') {
@@ -106,7 +125,7 @@ async function main() {
       }
     }
 
-    const result = {
+    const result: Result = {
       title: path.basename(directory),
       checks: checkResults,
       fileContents: getFileCache(directory),
@@ -122,12 +141,11 @@ async function main() {
 
   if (results.length > 0) {
     println('generating index...');
+    println();
 
     generateReportsIndex(resultsDirectory);
 
-    println(
-      `open ${path.join(resultsDirectory, 'index.html')} in a browser to view reports`
-    );
+    println(`open ${path.join(resultsDirectory, 'index.html')} in a browser to view reports`);
     println();
   }
 
@@ -144,9 +162,7 @@ async function getTargetDirectories() {
   });
 
   for (const arg of args._) {
-    const directory = path.isAbsolute(arg)
-      ? arg
-      : path.join(process.cwd(), arg);
+    const directory = path.isAbsolute(arg) ? arg : path.join(process.cwd(), arg);
 
     if (await directoryExists(directory)) {
       if (args.subfolders) {
@@ -190,7 +206,7 @@ async function findChecksFile() {
   return checksFilePath;
 }
 
-function getChecks(filePath) {
+function getChecks(filePath: string): ChecksConfiguration {
   try {
     return require(filePath);
   } catch (err) {
@@ -199,7 +215,11 @@ function getChecks(filePath) {
   }
 }
 
-async function performCheck(checkConfiguration, targetDirectory, context) {
+async function performCheck(
+  checkConfiguration: CheckConfiguration,
+  targetDirectory: string,
+  context: CompletedChecksStatus
+) {
   switch (checkConfiguration.type) {
     case 'file':
       return performFileCheck(checkConfiguration, targetDirectory);
@@ -207,24 +227,5 @@ async function performCheck(checkConfiguration, targetDirectory, context) {
       return performCommandCheck(checkConfiguration, targetDirectory);
     case 'match':
       return performMatchCheck(checkConfiguration, targetDirectory, context);
-    case 'search':
-      return performSearchCheck(checkConfiguration, targetDirectory);
   }
-}
-
-function quote(text, delimiter = '`') {
-  return delimiter + text + delimiter;
-}
-
-function print(...values) {
-  for (const value of values) {
-    process.stdout.write(value);
-  }
-}
-
-function println(...values) {
-  for (const value of values) {
-    process.stdout.write(value);
-  }
-  process.stdout.write('\n');
 }

@@ -1,7 +1,7 @@
 {
   "name": "autocheck",
   "description": "Automatically check for patterns against a set of files and executables, and generate a neat report to quickly examine the results.",
-  "main": "autocheck.js",
+  "main": "dist/autocheck.js",
   "version": "0.1.2",
   "author": {
     "name": "Josephus Paye II"
@@ -12,22 +12,30 @@
     "url": "git+https://github.com/JosephusPaye/autocheck.git"
   },
   "bin": {
-    "autocheck": "./autocheck.js"
+    "autocheck": "./dist/autocheck.js"
   },
   "scripts": {
-    "prepublishOnly": "cd viewer && npm run build && cd .."
+    "prepublishOnly": "cd viewer && npm run build && cd ..",
+    "build": "tsc && cp ./src/report/index-template.html ./dist/report/index-template.html",
+    "format": "prettier --write \"src/**/*.{ts,html}\" \"tests/**/*.{js,html}\" \"*.{js,json,md}\"",
+    "format:check": "prettier --list-different \"src/**/*.{ts,html}\" \"tests/**/*.{js,html}\" \"*.{js,json,md}\""
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=12.0.0"
   },
   "files": [
-    "viewer/dist",
-    "autocheck.js",
-    "check-command.js",
-    "check-file.js",
-    "check-match.js",
-    "fs.js",
+    "viewer/dist/index.html",
+    "viewer/dist/css/*.css",
+    "viewer/dist/js/*.js",
+    "dist/autocheck.js",
+    "dist/checks/*.js",
+    "dist/report/*.js",
+    "dist/report/*.html",
+    "dist/util/*.js",
     "LICENCE",
     "package.json",
     "README.md",
-    "report.js",
     "yarn.lock"
   ],
   "dependencies": {
@@ -39,6 +47,18 @@
     "yargs-parser": "^18.1.3"
   },
   "devDependencies": {
-    "prettier": "^2.0.4"
+    "@types/node": "^14.14.39",
+    "@types/picomatch": "^2.2.2",
+    "@types/rimraf": "^3.0.0",
+    "@types/yargs-parser": "^20.2.0",
+    "prettier": "^2.0.4",
+    "typescript": "^4.2.4"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "printWidth": 100,
+    "trailingComma": "es5"
   }
 }

@@ -49,12 +49,7 @@ Create a JSON file with the checks you want to run, like the following example (
   {
     "type": "file",
     "label": "Code Files",
-    "patterns": [
-      "**/Node.h",
-      "**/Node.cpp",
-      "**/LinkedList.h",
-      "**/LinkedList.cpp"
-    ]
+    "patterns": ["**/Node.h", "**/Node.cpp", "**/LinkedList.h", "**/LinkedList.cpp"]
   },
   {
     "type": "command",

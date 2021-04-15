@@ -3,6 +3,7 @@ node_modules
 /autocheck-reports
 /_files
 /viewer/dist
+/dist
 _del
 
 # local env files

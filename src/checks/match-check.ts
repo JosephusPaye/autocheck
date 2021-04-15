@@ -1,14 +1,31 @@
-// @ts-check
+import path from 'path';
 
-const path = require('path');
+import { CommonCheckConfiguration, CommonCheckResult, CompletedChecksStatus } from '../autocheck';
+import { fileExists, readString } from '../util/fs';
+import { quote } from '../util/string';
 
-const { fileExists, readString } = require('./fs');
+export interface MatchResult {
+  type: string;
+  url: string;
+  relativePath: string;
+}
 
-module.exports = async function performMatchCheck(
-  checkConfiguration,
-  targetDirectory,
-  context
-) {
+export interface MatchCheckConfiguration extends CommonCheckConfiguration {
+  type: 'match';
+  expected: string;
+  actual: string;
+}
+
+export interface MatchCheckResult extends CommonCheckResult {
+  expected?: string;
+  actual?: string;
+}
+
+export async function performMatchCheck(
+  checkConfiguration: MatchCheckConfiguration,
+  targetDirectory: string,
+  context: CompletedChecksStatus
+): Promise<MatchCheckResult> {
   if (!checkConfiguration.expected) {
     return {
       config: checkConfiguration,
@@ -26,17 +43,9 @@ module.exports = async function performMatchCheck(
   }
 
   try {
-    const expected = await expandExpression(
-      checkConfiguration.expected,
-      targetDirectory,
-      context
-    );
+    const expected = await resolveExpression(checkConfiguration.expected, targetDirectory, context);
 
-    const actual = await expandExpression(
-      checkConfiguration.actual,
-      targetDirectory,
-      context
-    );
+    const actual = await resolveExpression(checkConfiguration.actual, targetDirectory, context);
 
     const expectedTrimmed = expected.trim();
     const actualTrimmed = actual.trim();
@@ -56,12 +65,17 @@ module.exports = async function performMatchCheck(
       error: err,
     };
   }
-};
+}
 
-async function expandExpression(value, targetDirectory, context) {
+async function resolveExpression(
+  value: string,
+  targetDirectory: string,
+  context: CompletedChecksStatus
+) {
   if (value.startsWith('output:')) {
     const referenceName = value.replace('output:', '');
-    const reference = context[referenceName];
+    const reference = context.get(referenceName);
+
     if (reference) {
       if (reference.output) {
         return reference.output;
@@ -69,17 +83,13 @@ async function expandExpression(value, targetDirectory, context) {
         throw `The check ${quote(referenceName)} has no output.`;
       }
     } else {
-      throw `Unable to read output of check, the check ${quote(
-        referenceName
-      )} was not found.`;
+      throw `Unable to read output of check, the check ${quote(referenceName)} was not found.`;
     }
   }
 
   if (value.startsWith('file:')) {
     const fileName = value.replace('file:', '');
-    const filePath = path.isAbsolute(fileName)
-      ? fileName
-      : path.join(targetDirectory, fileName);
+    const filePath = path.isAbsolute(fileName) ? fileName : path.join(targetDirectory, fileName);
 
     if (await fileExists(filePath)) {
       try {
@@ -93,8 +103,4 @@ async function expandExpression(value, targetDirectory, context) {
   }
 
   return value;
-}
-
-function quote(text, delimiter = '`') {
-  return delimiter + text + delimiter;
 }
