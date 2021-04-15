@@ -14,8 +14,7 @@
     "focus-visible": "^5.0.2",
     "prismjs": "^1.21.0",
     "tailwindcss": "^1.2.0",
-    "vue": "^2.6.11",
-    "vue-prism-component": "^1.2.0"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",

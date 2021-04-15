@@ -30,7 +30,7 @@
       >
         <img :src="file.url" />
       </div>
-      <Prism
+      <CodeBlock
         v-else-if="isText(file.type)"
         style="height: 720px; overflow-x: auto"
         :fileExtension="file.type"
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import Prism from './Prism.vue';
+import CodeBlock from './CodeBlock.vue';
 import CheckResult from './CheckResult.vue';
 import CheckPagination from './CheckPagination.vue';
 import CheckDetails from './CheckDetails.vue';
@@ -86,7 +86,7 @@ export default {
     CheckResult,
     CheckPagination,
     CheckDetails,
-    Prism,
+    CodeBlock,
   },
 
   props: {

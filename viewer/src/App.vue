@@ -51,6 +51,8 @@ export default {
 <style lang="scss">
 @import './assets/tailwind.css';
 @import './assets/prism-okaidia.css';
+@import './assets/prism-line-numbers.css';
+@import './assets/prism-line-highlight.css';
 @import './assets/diff2html.css';
 
 body {

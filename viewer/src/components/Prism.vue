@@ -1,70 +1,90 @@
 <template>
-  <VuePrism :language="extensionToLanguage[fileExtension]">{{ code }}</VuePrism>
+  <pre
+    :class="preClass"
+    :data-line="highlightLines"
+  ><code ref="code" :class="codeClass"></code><slot></slot></pre>
 </template>
 
 <script>
-import 'prismjs';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-cpp';
-import 'prismjs/components/prism-csharp';
-import 'prismjs/components/prism-makefile';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-json';
-import VuePrism from 'vue-prism-component';
+const Prism = require('prismjs');
+require('prismjs/components/prism-markdown');
+require('prismjs/components/prism-c');
+require('prismjs/components/prism-cpp');
+require('prismjs/components/prism-csharp');
+require('prismjs/components/prism-makefile');
+require('prismjs/components/prism-java');
+require('prismjs/components/prism-python');
+require('prismjs/components/prism-markup');
+require('prismjs/components/prism-css');
+require('prismjs/components/prism-javascript');
+require('prismjs/components/prism-json');
+
+require('prismjs/plugins/line-numbers/prism-line-numbers');
+require('prismjs/plugins/line-highlight/prism-line-highlight');
 
 export default {
-  name: 'Prism',
-
-  components: {
-    VuePrism,
-  },
-
   props: {
-    fileExtension: String,
-    code: String,
+    language: {
+      type: String,
+      default: 'javascript',
+    },
+    code: {
+      type: String,
+      default: '',
+    },
+    showLineNumbers: {
+      type: Boolean,
+      default: true,
+    },
+    highlightLines: {
+      type: String,
+      default: undefined,
+    },
   },
 
-  data() {
-    return {
-      extensionToLanguage: {
-        txt: undefined, // no highlighting
-        md: 'markdown',
-        c: 'c',
-        cpp: 'cpp',
-        cs: 'csharp',
-        h: 'cpp',
-        hpp: 'cpp',
-        makefile: 'makefile',
-        java: 'java',
-        py: 'python',
-        html: 'markup',
-        css: 'css',
-        js: 'javascript',
-        json: 'json',
-        xml: 'markup',
-        svg: 'markup',
-      },
-    };
+  computed: {
+    preClass() {
+      return {
+        'line-numbers': this.showLineNumbers,
+      };
+    },
+
+    codeClass() {
+      return {
+        [`language-${this.language}`]: true,
+      };
+    },
+  },
+
+  methods: {
+    render() {
+      this.$nextTick(() => {
+        this.$refs.code.textContent = this.code;
+        Prism.highlightElement(this.$refs.code);
+      });
+    },
+  },
+
+  mounted() {
+    this.render();
+  },
+
+  watch: {
+    code() {
+      this.render();
+    },
+
+    language() {
+      this.render();
+    },
+
+    showLineNumbers() {
+      this.render();
+    },
+
+    highlightLines() {
+      this.render();
+    },
   },
 };
 </script>
-
-<style lang="scss">
-pre[class*='language-'] {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid hsl(0, 0%, 10%);
-  margin: 0;
-}
-
-pre[class*='language-'],
-code[class*='language-'] {
-  @apply font-mono;
-  font-size: 14px !important;
-}
-</style>
