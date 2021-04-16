@@ -3,7 +3,7 @@ import path from 'path';
 import { CommonCheckConfiguration, CommonCheckResult } from '../autocheck';
 
 import { expandGlobs, isTextFile, readStringAndCache } from '../util/fs';
-import { patternToRegex } from '../util/regex';
+import { makeMatchedDelimiterRegex, makeSingleDelimiterRegex, patternToRegex } from '../util/regex';
 
 export interface SearchCheckConfiguration extends CommonCheckConfiguration {
   type: 'search';
@@ -11,6 +11,7 @@ export interface SearchCheckConfiguration extends CommonCheckConfiguration {
   filePatterns: string[];
   matchCase?: boolean;
   matchAsRegex?: boolean;
+  skipComments?: boolean | Array<string | string[]>;
   passWhen: 'found' | 'not-found';
 }
 
@@ -23,6 +24,7 @@ export interface SearchMatch {
   context: [string, string];
   line: number;
   offset: number;
+  offsetInFile: number;
 }
 
 export interface SearchResult {
@@ -57,7 +59,11 @@ export async function performSearchCheck(
 
     if (isTextFile(result.type)) {
       const fileContent = await readStringAndCache(file.path, file.relativePath, targetDirectory);
-      result.matches = getSearchMatches(fileContent, patternRegexes);
+      result.matches = getSearchMatches(
+        fileContent,
+        patternRegexes,
+        checkConfiguration.skipComments
+      );
     }
 
     if (result.matches.length > 0) {
@@ -84,7 +90,7 @@ export async function performSearchCheck(
   };
 }
 
-function configPatternsToRegex(
+export function configPatternsToRegex(
   patterns: string[],
   options: { matchAsRegex?: boolean; matchCase?: boolean }
 ) {
@@ -106,17 +112,36 @@ function configPatternsToRegex(
   return patternRegexes;
 }
 
-function getSearchMatches(fileContent: string, patterns: RegExp[]): SearchMatch[] {
-  return search(fileContent, patterns);
-  // TODO: filter results from search() to remove matches inside comments here
+export function getSearchMatches(
+  fileContent: string,
+  patterns: RegExp[],
+  skipComments?: Array<string | string[]> | boolean
+): SearchMatch[] {
+  let matches = search(fileContent, patterns);
+
+  if (skipComments) {
+    const delimiters = Array.isArray(skipComments) ? skipComments : [['/*', '*/'], '//'];
+
+    const commentRanges = findCommentRanges(fileContent, delimiters);
+
+    if (commentRanges.length > 0) {
+      matches = matches.filter((match) => {
+        return isInRange(commentRanges, match.offsetInFile, match.text.length) === false;
+      });
+    }
+  }
+
+  return matches;
 }
 
-function search(fileContent: string, patterns: RegExp[]): SearchMatch[] {
+export function search(fileContent: string, patterns: RegExp[]): SearchMatch[] {
   const matches: SearchMatch[] = [];
   const lines = fileContent.split('\n');
 
   for (const regex of patterns) {
-    lines.forEach((line, index) => {
+    let currentLineIndex = 0;
+
+    lines.forEach((line, lineIndex) => {
       const originalLine = line + '\n';
 
       let lineMatches = Array.from(originalLine.matchAll(regex)).map((match) => {
@@ -134,18 +159,52 @@ function search(fileContent: string, patterns: RegExp[]): SearchMatch[] {
           );
         }
 
+        const offsetOnLine = match.index ?? -Infinity;
+        const offsetInFile = currentLineIndex + offsetOnLine;
+
         return {
           text,
           context,
-          line: index + 1,
-          offset: match.index ?? -1,
+          line: lineIndex + 1,
+          offset: offsetOnLine,
+          offsetInFile,
         };
       });
 
       matches.push(...lineMatches);
+
+      currentLineIndex += originalLine.length;
     });
   }
 
   return matches;
 }
 
+export function findCommentRanges(text: string, commentDelimiters: Array<string | string[]>) {
+  const commentRanges: [number, number][] = [];
+
+  for (const delimiter of commentDelimiters) {
+    const regex = Array.isArray(delimiter)
+      ? makeMatchedDelimiterRegex(delimiter[0], delimiter[1])
+      : makeSingleDelimiterRegex(delimiter);
+
+    const matchedRanges = Array.from(text.matchAll(regex))
+      .filter((match) => match[0] !== undefined && match[0] !== null)
+      .map((match) => {
+        return [match.index, match[0].length] as [number, number];
+      })
+      .filter((range) => {
+        return isInRange(commentRanges, range[0], range[1]) === false;
+      });
+
+    commentRanges.push(...matchedRanges);
+  }
+
+  return commentRanges;
+}
+
+export function isInRange(existingRanges: [number, number][], index: number, length: number) {
+  return existingRanges.some(([rangeIndex, rangeLength]) => {
+    return index >= rangeIndex && index < rangeIndex + rangeLength && length <= rangeLength;
+  });
+}
