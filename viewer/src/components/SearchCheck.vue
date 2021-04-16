@@ -176,7 +176,7 @@ export default {
         },
         {
           label: 'Match regex',
-          values: [String(this.check.config.matchPatternsAsRegex ?? false)],
+          values: [String(this.check.config.matchAsRegex ?? false)],
         },
         {
           label: 'Pass when',
