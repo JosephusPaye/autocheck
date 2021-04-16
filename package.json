@@ -30,6 +30,7 @@
     "viewer/dist/css/*.css",
     "viewer/dist/js/*.js",
     "dist/autocheck.js",
+    "dist/main.js",
     "dist/checks/*.js",
     "dist/report/*.js",
     "dist/report/*.html",
