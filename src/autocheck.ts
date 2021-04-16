@@ -286,8 +286,13 @@ async function generatePerCheckReports(results: Result[], resultsDirectory: stri
   const perCheckResultsDirectory = path.join(resultsDirectory, 'per-check');
   await copySupportingFiles(perCheckResultsDirectory);
 
+  let i = 1;
   for (const check of perCheckResults.values()) {
-    const outputFile = await createReport(check, perCheckResultsDirectory);
+    const outputFile = await createReport(
+      check,
+      perCheckResultsDirectory,
+      String(i++).padStart(2, '0') + '. '
+    );
     println('  check report: ', relative(outputFile));
   }
 

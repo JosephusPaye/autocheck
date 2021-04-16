@@ -9,14 +9,21 @@ import { Result } from '../autocheck';
 const viewerDistDirectory = path.join(__dirname, '..', '..', 'viewer', 'dist');
 
 const reportTemplatePath = path.join(viewerDistDirectory, 'index.html');
-export async function createReport(result: Result, resultsDirectory: string): Promise<string> {
+export async function createReport(
+  result: Result,
+  resultsDirectory: string,
+  fileNamePrepend: string = ''
+): Promise<string> {
   const template = await getTemplate(reportTemplatePath);
 
   const report = template
     .replace('$TITLE', result.title)
     .replace('$REPORT', JSON.stringify(result));
 
-  const reportFilePath = path.join(resultsDirectory, filenamify(result.title.trim()) + '.html');
+  const reportFilePath = path.join(
+    resultsDirectory,
+    filenamify(fileNamePrepend + result.title.trim()) + '.html'
+  );
 
   await writeString(reportFilePath, report);
 
