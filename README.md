@@ -9,6 +9,7 @@ With Autocheck, you can automatically run checks that:
 - Look for specific files (text files, code files, PDFs, and images), and embed them in the report. Use this to check for READMEs, assignment cover sheets, etc.
 - Execute commands (with an input file for stdin), and embed the output in the report. Use this to compile and run code. It even supports running commands in [Cygwin](https://cygwin.com/) on Windows.
 - Compare files or output from commands against an expected result, and show any differences in the report. Use this to compare the output of student code to some expected standard.
+- Search for the presence or absence of specific strings in specific files, optionally using a regex. It's smart enough to skip comments. Use this to find keywords and special strings.
 
 ---
 
@@ -72,6 +73,15 @@ Create a JSON file with the checks you want to run, like the following example (
     "if": "Runs",
     "expected": "file:C:\\path\\to\\file\\with\\expected-output.txt",
     "actual": "output:Runs"
+  },
+  {
+    "type": "search",
+    "label": "Doesn't use `struct` or `friend`",
+    "filePatterns": ["**/Node.h", "**/Node.cpp", "**/LinkedList.h", "**/LinkedList.cpp"],
+    "patterns": ["friend\\s+", "struct\\s+"],
+    "matchAsRegex": true,
+    "skipComments": true,
+    "passWhen": "not-found"
   }
 ]
 ```
@@ -179,7 +189,7 @@ Produces the following output:
 ```
 C:\code\JosephusPaye\autocheck\example
 > autocheck checks.json "C:\\code\\JosephusPaye\\SENG1120-Assignment-1"
-running checks from C:\code\JosephusPaye\autocheck\example\checks.json
+running checks from .\checks.json
 
 checking directory (1/1): C:\code\JosephusPaye\SENG1120-Assignment-1
   running check (1/5): Cover Sheet and Readme
@@ -192,7 +202,7 @@ checking directory (1/1): C:\code\JosephusPaye\SENG1120-Assignment-1
     check passed
   running check (5/5): Matches Expected Output
     check failed
-generated report: C:\code\JosephusPaye\autocheck\example\autocheck-reports\SENG1120-Assignment-1.html
+generated report: .\autocheck-reports\SENG1120-Assignment-1.html
 
 done
 ```
@@ -281,13 +291,28 @@ Some notes:
 - Both pieces of text will be be trimmed and compared
 - If they're the same, the actual text will be shown in the report. Otherwise, a diff will be shown with the differences.
 
+### Search check
+
+Use this check to look for specific strings and keywords in text/code files, and embed the search results in the report. Note that only text files can be searched and embedded (see **File check** for embeddable files).
+
+This check supports the following configuration options (in additional to the common options described above):
+
+| Option         | Type                      | Presence | Description                                                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filePatterns` | List&nbsp;of&nbsp;Strings | Required | A list of file path patterns ([globs](<https://en.wikipedia.org/wiki/Glob_(programming)>)), relative to the target directory. For example, `["**/*.{h,cpp,txt}"]` will match all `.h`, `.cpp`, and `.txt` files in the target directory.                                                                                                                            |
+| `patterns`     | List of Strings           | Required | A list of patterns to search for, can be strings or regular expressions. For example, `["friend", "struct"]` will match files with the string `friend` or `struct`, while `["if\s*\(", "while\s*\("]` will match the start of `if` and `while` statements.                                                                                                          |
+| `matchCase`    | Boolean                   | Optional | For non-regex patterns, use case-sensitive matching. Default is `false`.                                                                                                                                                                                                                                                                                            |
+| `matchAsRegex` | Boolean                   | Optional | Match the patterns as regular expressions. Default is `false`.                                                                                                                                                                                                                                                                                                      |
+| `skipComments` | Boolean or Array          | Optional | Skip strings in comments when matching. Default is `false`. Strings are considered comments if they fall within the range of the given array of delimiters. For example, `[["/*", "*/"], "//"]` will skip strings between `/*` and `*/`, as well as strings between `//` and a new line. Set to `true` to match the default C-style comments: `/*` + `*/` and `//`. |
+| `passWhen`     | `found` or `not-found`    | Optional | Choose when to mark the check as passed. Setting to `found` will pass the check if a pattern is found, and fail it otherwise. Setting to `not-found` will fail the check if a pattern is found, and pass it otherwise.                                                                                                                                              |
+
 ## What's next
 
-- [ ] Record a tutorial video
+- [x] Record a tutorial video
 - [x] Add screenshots to this README showing example results of each check
-- [ ] Add colors to the CLI output
+- [x] Add colors to the CLI output
 - [ ] Warn when commands block for stdin if there's no `input` specified
-- [ ] Add search check
+- [x] Add search check
 - [ ] Add support for user-defined checks (bring your own checks)
 - [ ] Improve check navigation - add collapse/expand all checks button to header, scroll to next (arrow down icon), and scroll to previous (arrow up icon) buttons, with smooth scrolling
 
