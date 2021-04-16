@@ -165,7 +165,7 @@ export async function main(
     println();
   }
 
-  if (results.length > 0) {
+  if (results.length > 1) {
     println(color.blue('generating per-check reports...'));
     const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory);
 
