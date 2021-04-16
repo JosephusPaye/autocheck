@@ -54,6 +54,14 @@ export interface Result {
   fileContents: Record<string, string>;
 }
 
+function relative(pathToPrint: string) {
+  return path.isAbsolute(pathToPrint)
+    ? pathToPrint
+        .replace(process.cwd() + path.sep, '.' + path.sep)
+        .replace(process.cwd(), '.' + path.sep)
+    : pathToPrint;
+}
+
 export async function main(
   checksFileArg: string,
   targetDirectoryArgs: string[],
@@ -62,7 +70,7 @@ export async function main(
   const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
 
-  println(color.yellow(`running checks from ${checksFile}`));
+  println(color.blue(`running checks from ${relative(checksFile)}`));
   println();
 
   const targetDirectories = await resolveTargetDirectories(targetDirectoryArgs, useSubfolders);
@@ -73,7 +81,9 @@ export async function main(
 
   let i = 1;
   for (let directory of targetDirectories) {
-    println(color.yellow(`checking directory (${i++}/${targetDirectories.length}): ${directory}`));
+    println(
+      color.blue(`checking directory (${i++}/${targetDirectories.length}): ${relative(directory)}`)
+    );
 
     const completedChecks: CompletedChecksStatus = new Map();
     const checkResults: CommonCheckResult[] = [];
@@ -150,20 +160,28 @@ export async function main(
     results.push(result);
 
     const reportFilePath = await createReport(result, resultsDirectory);
-    println('  generated report: ', reportFilePath);
+    println('  generated report: ', relative(reportFilePath));
 
     println();
   }
 
   if (results.length > 0) {
-    println(color.yellow(`generating index at ${path.join(resultsDirectory, 'index.html')} ...`));
-    generateReportsIndex(resultsDirectory);
+    println(color.blue('generating per-check reports...'));
+    const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory);
 
-    println(`  open in a browser to view reports`);
+    println();
+    println(color.blue('generating indexes...'));
+
+    let outputFile = await generateReportsIndex(resultsDirectory);
+    println('  per-target index: ', relative(outputFile));
+
+    outputFile = await generateReportsIndex(perCheckResultsDirectory);
+    println('  per-check index: ', relative(outputFile));
+
     println();
   }
 
-  println(color.yellow('done'));
+  println(color.blue('done'));
 }
 
 async function resolveTargetDirectories(targetDirectoryArgs: string[], useSubfolders: boolean) {
@@ -226,4 +244,52 @@ async function performCheck(
     case 'search':
       return performSearchCheck(checkConfiguration, targetDirectory);
   }
+}
+
+/**
+ * Turns the list of per-target results to a list of per-check results,
+ * in the same format that the frontend expects, just changing titles,
+ * labels, and file paths.
+ */
+async function generatePerCheckReports(results: Result[], resultsDirectory: string) {
+  const perCheckResults = new Map<string, Result>();
+
+  results.forEach((result) => {
+    result.checks.forEach((check) => {
+      const transformedResult = perCheckResults.get(check.config.label) ?? {
+        title: check.config.label,
+        fileContents: {},
+        checks: [],
+      };
+
+      Object.entries(result.fileContents).forEach(([key, value]) => {
+        transformedResult.fileContents[result.title + '/' + key] = value;
+      });
+
+      const transformedCheck = Object.assign({}, check, {
+        config: Object.assign({}, check.config, {
+          label: result.title,
+        }),
+        results: ((check as any).results as { relativePath: string }[] | undefined)?.map((file) => {
+          return Object.assign({}, file, {
+            relativePath: file.relativePath ? `${result.title}/${file.relativePath}` : undefined,
+          });
+        }),
+      });
+
+      transformedResult.checks.push(transformedCheck);
+
+      perCheckResults.set(check.config.label, transformedResult);
+    });
+  });
+
+  const perCheckResultsDirectory = path.join(resultsDirectory, 'per-check');
+  await copySupportingFiles(perCheckResultsDirectory);
+
+  for (const check of perCheckResults.values()) {
+    const outputFile = await createReport(check, perCheckResultsDirectory);
+    println('  check report: ', relative(outputFile));
+  }
+
+  return perCheckResultsDirectory;
 }

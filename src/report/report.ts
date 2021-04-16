@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import url from 'url';
+import filenamify from 'filenamify';
 
 import { writeString, cleanDirectoryContent, copyDirectory, readStringAndCache } from '../util/fs';
 import { Result } from '../autocheck';
@@ -15,7 +16,7 @@ export async function createReport(result: Result, resultsDirectory: string): Pr
     .replace('$TITLE', result.title)
     .replace('$REPORT', JSON.stringify(result));
 
-  const reportFilePath = path.join(resultsDirectory, result.title.trim() + '.html');
+  const reportFilePath = path.join(resultsDirectory, filenamify(result.title.trim()) + '.html');
 
   await writeString(reportFilePath, report);
 
@@ -57,7 +58,11 @@ export async function generateReportsIndex(resultsDirectory: string) {
   const template = await getTemplate(indexTemplatePath);
   const html = template.replace('{{ $REPORT_LINKS }}', links.join('\n'));
 
-  await writeString(path.join(resultsDirectory, 'index.html'), html);
+  const fileName = path.join(resultsDirectory, 'index.html');
+
+  await writeString(fileName, html);
+
+  return fileName;
 }
 
 const reportFilesNamespace = '__autocheck-report-templates';
