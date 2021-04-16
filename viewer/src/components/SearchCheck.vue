@@ -65,6 +65,30 @@
         <span class="mt-3 text-lg text-gray-700">This file can't be embedded.</span>
       </div>
     </div>
+    <div
+      v-else
+      slot="preview"
+      class="flex flex-col w-full border rounded justify-center items-center p-5 h-full"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-green-500"
+      >
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span class="mt-3 text-lg text-gray-700"
+        >{{ passWhenFound ? 'Patterns found' : 'Patterns not found' }}
+      </span>
+    </div>
   </CheckResult>
 </template>
 
@@ -168,6 +192,10 @@ export default {
       }
 
       return details;
+    },
+
+    passWhenFound() {
+      return (this.check.config.passWhen ?? 'found') === 'found';
     },
   },
 
