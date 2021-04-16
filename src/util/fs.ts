@@ -146,3 +146,24 @@ export async function directoryExists(directoryPath: string): Promise<boolean> {
     return false;
   }
 }
+
+export function isTextFile(extension: string) {
+  return [
+    'txt',
+    'md',
+    'c',
+    'cpp',
+    'cs',
+    'h',
+    'hpp',
+    'makefile',
+    'java',
+    'py',
+    'html',
+    'css',
+    'js',
+    'json',
+    'xml',
+    'svg',
+  ].includes(extension);
+}

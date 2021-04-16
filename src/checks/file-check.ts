@@ -1,7 +1,7 @@
 import url from 'url';
 import path from 'path';
 
-import { expandGlobs, readStringAndCache } from '../util/fs';
+import { expandGlobs, isTextFile, readStringAndCache } from '../util/fs';
 import { CommonCheckConfiguration, CommonCheckResult } from '../autocheck';
 
 export interface FileResult {
@@ -37,7 +37,7 @@ export async function performFileCheck(
       relativePath: file.relativePath,
     };
 
-    if (isText(result.type)) {
+    if (isTextFile(result.type)) {
       await readStringAndCache(file.path, file.relativePath, targetDirectory);
     }
 
@@ -50,25 +50,4 @@ export async function performFileCheck(
     results,
     error: results.length > 0 ? undefined : 'No matching files found',
   };
-}
-
-function isText(extension: string) {
-  return [
-    'txt',
-    'md',
-    'c',
-    'cpp',
-    'cs',
-    'h',
-    'hpp',
-    'makefile',
-    'java',
-    'py',
-    'html',
-    'css',
-    'js',
-    'json',
-    'xml',
-    'svg',
-  ].includes(extension);
 }

@@ -15,11 +15,11 @@ pre[data-line] code[class*='language-'] {
   padding: inherit 0;
   margin-top: 1em; /* Same as .prism’s padding-top */
 
-  background: rgb(153, 122, 102, 0.3);
+  background: rgb(153, 122, 102, 0.5);
   background: linear-gradient(
     to right,
-    rgba(153, 122, 102, 0.3) 70%,
-    rgba(153, 122, 102, 0.075)
+    rgba(153, 122, 102, 0.5) 70%,
+    rgba(153, 122, 102, 0.1)
   );
 
   pointer-events: none;

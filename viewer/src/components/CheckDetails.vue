@@ -24,7 +24,7 @@
           stroke-linecap="round"
           stroke-linejoin="round"
           class="feather feather-chevron-left"
-          :style="{ transform: expanded ? 'rotateY(0)' : 'rotateY(180deg)' }"
+          :style="{ transform: expanded ? 'rotate(0)' : 'rotate(180deg)' }"
         >
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
@@ -48,24 +48,7 @@
           </div>
         </div>
       </div>
-      <template v-if="results">
-        <div class="text-sm uppercase font-semibold px-4 py-4 leading-none">
-          {{ resultLabel || 'Results' }}
-        </div>
-        <button
-          v-for="(result, i) in results"
-          :key="i"
-          @click="$emit('select', i)"
-          class="px-4 w-full truncate text-left py-2 leading-none result-item hover:bg-gray-200"
-          :class="[i === selectedResultIndex ? 'is-selected' : '']"
-          :title="result"
-        >
-          {{ result }}
-        </button>
-        <div v-if="results.length === 0" class="px-4 pb-4 text-gray-600">
-          {{ resultLabelEmpty || 'No results' }}
-        </div>
-      </template>
+      <slot></slot>
     </div>
   </div>
 </template>
@@ -77,10 +60,6 @@ export default {
   props: {
     type: String,
     details: Array,
-    resultLabel: String,
-    resultLabelEmpty: String,
-    results: Array,
-    selectedResultIndex: Number,
     expanded: Boolean,
   },
 
@@ -98,21 +77,6 @@ export default {
 
   &:not(:last-child) {
     @apply border-b mb-2 pb-2;
-  }
-}
-
-.result-item {
-  & + & {
-    @apply border-t;
-  }
-
-  &.is-selected {
-    @apply bg-blue-200;
-
-    &,
-    & + .result-item {
-      @apply border-transparent;
-    }
   }
 }
 </style>

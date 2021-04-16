@@ -2,7 +2,6 @@
   <CheckResult
     :label="check.config.label"
     :status="check.status"
-    :error="check.error"
     :sidebarExpanded="sidebarExpanded"
   >
     <CheckDetails
@@ -12,20 +11,20 @@
       :expanded.sync="sidebarExpanded"
     >
       <FileTree
-        label="Matching files"
-        :items="results"
-        :labelEmpty="check.error"
+        :label="`Search results (${results.list.length})`"
+        :items="results.tree"
+        labelEmpty="No matches found"
         :selectedItemIndex="pagination.current - 1"
         @select="onResultSelect"
       />
     </CheckDetails>
     <CheckPagination
-      v-if="check.results.length > 1"
+      v-if="results.list.length > 1"
       slot="actions"
-      :total="pagination.total"
+      :total="results.list.length"
       :current.sync="pagination.current"
     />
-    <div v-if="check.results.length > 0" slot="preview">
+    <div v-if="results.list.length > 0" slot="preview">
       <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 720px;">
         <img :src="file.url" />
       </div>
@@ -34,6 +33,7 @@
         style="height: 720px; overflow-x: auto"
         :fileExtension="file.type"
         :code="getFileContent(file.relativePath)"
+        :highlightLines="fileHighlights"
       />
       <embed
         v-else-if="file.type === 'pdf'"
@@ -76,7 +76,7 @@ import CheckDetails from './CheckDetails.vue';
 import FileTree from './FileTree.vue';
 
 export default {
-  name: 'FileCheck',
+  name: 'SearchCheck',
 
   components: {
     CheckResult,
@@ -95,29 +95,79 @@ export default {
       sidebarExpanded: true,
       pagination: {
         current: 1,
-        total: this.check.results.length,
       },
     };
   },
 
   computed: {
+    results() {
+      const list = [];
+
+      let index = 0;
+      const tree = this.check.results.map((result, resultIndex) => {
+        return {
+          value: result.relativePath + ` (${result.matches.length})`,
+          children: result.matches.map(match => {
+            const child = {
+              value: match.text,
+              context: match.context,
+              line: match.line,
+              offset: match.offset,
+              result,
+              resultIndex,
+              index: index++,
+            };
+
+            list.push(child);
+
+            return child;
+          }),
+        };
+      });
+
+      return { list, tree };
+    },
+
     file() {
-      return this.check.results[this.pagination.current - 1];
+      return this.results.list[this.pagination.current - 1]?.result;
+    },
+
+    fileHighlights() {
+      return String(this.results.list[this.pagination.current - 1]?.line ?? '');
     },
 
     details() {
-      return [
+      const details = [
         {
           label: 'Patterns',
           values: this.check.config.patterns,
         },
+        {
+          label: 'File patterns',
+          values: this.check.config.filePatterns,
+        },
+        {
+          label: 'Match case',
+          values: [String(this.check.config.matchCase ?? false)],
+        },
+        {
+          label: 'Match regex',
+          values: [String(this.check.config.matchPatternsAsRegex ?? false)],
+        },
+        {
+          label: 'Pass when',
+          values: [this.check.config.passWhen ?? 'found'],
+        },
       ];
-    },
 
-    results() {
-      return this.check.results.map((result, i) => {
-        return { value: result.relativePath, index: i };
-      });
+      if (this.check.error) {
+        details.push({
+          label: 'Error',
+          values: [this.check.error],
+        });
+      }
+
+      return details;
     },
   },
 

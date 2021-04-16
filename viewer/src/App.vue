@@ -1,6 +1,6 @@
 <template>
   <div id="app" style="padding-top: 60px;">
-    <div class="bg-gray-900 text-white w-full fixed top-0">
+    <div class="bg-gray-900 text-white w-full fixed top-0 z-10">
       <div class="container mx-auto px-4 py-3 text-2xl">{{ report.title }} – Autocheck report</div>
     </div>
     <component
@@ -16,6 +16,7 @@
 import FileCheck from './components/FileCheck.vue';
 import CommandCheck from './components/CommandCheck.vue';
 import MatchCheck from './components/MatchCheck.vue';
+import SearchCheck from './components/SearchCheck.vue';
 
 export default {
   name: 'App',
@@ -24,6 +25,7 @@ export default {
     FileCheck,
     CommandCheck,
     MatchCheck,
+    SearchCheck,
   },
 
   data() {
@@ -40,6 +42,7 @@ export default {
         file: 'FileCheck',
         command: 'CommandCheck',
         match: 'MatchCheck',
+        search: 'SearchCheck',
       },
     };
   },

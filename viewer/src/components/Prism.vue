@@ -22,6 +22,10 @@ require('prismjs/components/prism-json');
 require('prismjs/plugins/line-numbers/prism-line-numbers');
 require('prismjs/plugins/line-highlight/prism-line-highlight');
 
+// Hacky way to opt-out of smooth scroll because I can't do a UI right now
+// Override in console to apply
+window.disableSmoothScroll = false;
+
 export default {
   props: {
     fileExtension: {
@@ -76,7 +80,33 @@ export default {
       this.$nextTick(() => {
         this.$refs.code.textContent = this.code;
         Prism.highlightElement(this.$refs.code);
+
+        this.$nextTick(() => {
+          this.scrollToHighlightedLine();
+        });
       });
+    },
+
+    scrollToHighlightedLine() {
+      const line = this.$el.querySelector('.line-highlight');
+
+      if (line && line.parentElement) {
+        const parentOffsetHeight = line.parentElement.offsetHeight;
+        const offsetHeight = line.offsetHeight;
+        const offsetTop = line.offsetTop;
+
+        const target = offsetTop + offsetHeight / 2 - parentOffsetHeight / 2 - offsetHeight / 3;
+
+        if (window.disableSmoothScroll) {
+          line.parentElement.scrollTop = target;
+        } else {
+          line.parentElement.scrollTo({
+            top: target,
+            left: 0,
+            behavior: 'smooth',
+          });
+        }
+      }
     },
   },
 

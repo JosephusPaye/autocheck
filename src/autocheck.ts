@@ -8,6 +8,11 @@ import {
   CommandCheckResult,
 } from './checks/command-check';
 import { performMatchCheck, MatchCheckConfiguration, MatchCheckResult } from './checks/match-check';
+import {
+  performSearchCheck,
+  SearchCheckConfiguration,
+  SearchCheckResult,
+} from './checks/search-check';
 
 import { print, println } from './util/console';
 import { getFileCache, fileExists, directoryExists, listDirectories } from './util/fs';
@@ -16,7 +21,7 @@ import { quote } from './util/string';
 import { copySupportingFiles, createReport, generateReportsIndex } from './report/report';
 
 export interface CommonCheckConfiguration {
-  type: 'file' | 'command' | 'match';
+  type: 'file' | 'command' | 'match' | 'search';
   label: string;
   if?: string;
 }
@@ -31,12 +36,17 @@ export interface CommonCheckResult {
 export type ChecksConfiguration = CheckConfiguration[];
 export type CompletedChecksStatus = Map<string, Pick<CommonCheckResult, 'status' | 'output'>>;
 
-export type CheckResult = FileCheckResult | CommandCheckResult | MatchCheckResult;
+export type CheckResult =
+  | FileCheckResult
+  | CommandCheckResult
+  | MatchCheckResult
+  | SearchCheckResult;
 
 export type CheckConfiguration =
   | FileCheckConfiguration
   | CommandCheckConfiguration
-  | MatchCheckConfiguration;
+  | MatchCheckConfiguration
+  | SearchCheckConfiguration;
 
 export interface Result {
   title: string;
@@ -213,5 +223,7 @@ async function performCheck(
       return performCommandCheck(checkConfiguration, targetDirectory);
     case 'match':
       return performMatchCheck(checkConfiguration, targetDirectory, context);
+    case 'search':
+      return performSearchCheck(checkConfiguration, targetDirectory);
   }
 }
