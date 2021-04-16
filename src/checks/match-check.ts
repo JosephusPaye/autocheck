@@ -14,12 +14,15 @@ export interface MatchCheckConfiguration extends CommonCheckConfiguration {
   type: 'match';
   expected: string;
   actual: string;
+  ignoreTrailingSpaces?: boolean;
 }
 
 export interface MatchCheckResult extends CommonCheckResult {
   expected?: string;
   actual?: string;
 }
+
+const trailingSpacesRegex = /[ \t]+([\r\n]+)/g;
 
 export async function performMatchCheck(
   checkConfiguration: MatchCheckConfiguration,
@@ -47,8 +50,13 @@ export async function performMatchCheck(
 
     const actual = await resolveExpression(checkConfiguration.actual, targetDirectory, context);
 
-    const expectedTrimmed = expected.trim();
-    const actualTrimmed = actual.trim();
+    let expectedTrimmed = expected.trim();
+    let actualTrimmed = actual.trim();
+
+    if (checkConfiguration.ignoreTrailingSpaces ?? true) {
+      expectedTrimmed = expectedTrimmed.replace(trailingSpacesRegex, (_match, group1) => group1);
+      actualTrimmed = actualTrimmed.replace(trailingSpacesRegex, (_match, group1) => group1);
+    }
 
     const passed = expectedTrimmed === actualTrimmed;
 
