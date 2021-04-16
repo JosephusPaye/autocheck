@@ -1,7 +1,7 @@
 <template>
   <div
     class="flex flex-col h-full overflow-y-auto"
-    :style="{ width: !expanded ? '32px' : undefined }"
+    :style="{ width: !expanded ? '32px' : undefined, 'max-height': '800px' }"
   >
     <div
       class="flex capitalize bg-gray-300 px-4 py-2 font-semibold rounded-t"
@@ -30,7 +30,7 @@
         </svg>
       </button>
     </div>
-    <div class="border border-gray-300 border-t-0 rounded-b flex-grow" v-show="expanded">
+    <div class="border border-gray-300 border-t-0 rounded-b h-full flex flex-col" v-show="expanded">
       <div v-if="details" class="p-4 border-b border-gray-300">
         <div v-for="(detail, i) in details" :key="i" class="grid gap-3 detail leading-none">
           <div class="text-sm uppercase tracking-wider text-gray-700 truncate">

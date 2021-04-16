@@ -26,12 +26,12 @@
       :current.sync="pagination.current"
     />
     <div v-if="check.results.length > 0" slot="preview">
-      <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 720px;">
+      <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 800px;">
         <img :src="file.url" />
       </div>
       <Prism
         v-else-if="isText(file.type)"
-        style="height: 720px; overflow-x: auto"
+        style="height: 800px; overflow-x: auto"
         :fileExtension="file.type"
         :code="getFileContent(file.relativePath)"
       />
@@ -39,13 +39,13 @@
         v-else-if="file.type === 'pdf'"
         scale="tofit"
         width="100%"
-        height="720px"
+        height="800px"
         :src="file.url"
       />
       <div
         v-else
         class="flex flex-col w-full border rounded justify-center items-center"
-        style="height: 720px;"
+        style="height: 800px;"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -22,7 +22,7 @@
         <div class="mb-2">✅ Actual matches expected</div>
         <pre
           class="overflow-auto w-full language-plain"
-          style="min-height: 400px; max-height: 720px; margin: 0"
+          style="min-height: 400px; max-height: 800px; margin: 0"
           v-html="check.actual"
         ></pre>
       </div>
