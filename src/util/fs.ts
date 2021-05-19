@@ -98,7 +98,7 @@ export async function listDirectories(
 
 export async function expandGlobs(rootDirectory: string, globs: string[]): Promise<FileList> {
   const files = await listFiles(rootDirectory, rootDirectory);
-  const isMatch = picomatch(globs);
+  const isMatch = picomatch(globs, { nocase: true } as any);
 
   return files.filter((file) => isMatch(file.relativePath));
 }
