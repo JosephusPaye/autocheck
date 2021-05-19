@@ -187,7 +187,9 @@ export async function main(
 async function resolveTargetDirectories(targetDirectoryArgs: string[], useSubfolders: boolean) {
   const targetDirectories = [];
 
-  for (const arg of targetDirectoryArgs) {
+  for (let arg of targetDirectoryArgs) {
+    arg = arg.replace(/"/g, '');
+
     const directory = path.isAbsolute(arg) ? arg : path.join(process.cwd(), arg);
 
     if (await directoryExists(directory)) {
