@@ -3,7 +3,7 @@ import fs from 'fs';
 import url from 'url';
 import filenamify from 'filenamify';
 
-import { writeString, cleanDirectoryContent, copyDirectory, readStringAndCache } from '../util/fs';
+import { writeString, copyDirectory, readStringAndCache } from '../util/fs';
 import { Result } from '../autocheck';
 
 const viewerDistDirectory = path.join(__dirname, '..', '..', 'viewer', 'dist');
@@ -31,8 +31,6 @@ export async function createReport(
 }
 
 export async function copySupportingFiles(resultsDirectory: string) {
-  await cleanDirectoryContent(resultsDirectory);
-
   return copyDirectory(viewerDistDirectory, resultsDirectory, {
     filter(stat, filepath) {
       // Don't copy .html files

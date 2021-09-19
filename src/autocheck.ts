@@ -15,7 +15,7 @@ import {
 } from './checks/search-check';
 
 import { print, println } from './util/console';
-import { getFileCache, fileExists, directoryExists, listDirectories } from './util/fs';
+import { getFileCache, fileExists, directoryExists, listDirectories, cleanDirectoryContent } from './util/fs';
 import { quote } from './util/string';
 
 import { copySupportingFiles, createReport, generateReportsIndex } from './report/report';
@@ -65,7 +65,8 @@ function relative(pathToPrint: string) {
 export async function main(
   checksFileArg: string,
   targetDirectoryArgs: string[],
-  useSubfolders: boolean
+  useSubfolders: boolean,
+  cleanResultsDirectory: boolean,
 ) {
   const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
@@ -77,6 +78,11 @@ export async function main(
   const results: Result[] = [];
 
   const resultsDirectory = path.join(process.cwd(), 'autocheck-reports');
+
+  if (cleanResultsDirectory) {
+    cleanDirectoryContent(resultsDirectory);
+  }
+
   await copySupportingFiles(resultsDirectory);
 
   let i = 1;
@@ -167,7 +173,7 @@ export async function main(
 
   if (results.length > 1) {
     println(color.blue('generating per-check reports...'));
-    const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory);
+    const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory, cleanResultsDirectory);
 
     println();
     println(color.blue('generating indexes...'));
@@ -253,7 +259,7 @@ async function performCheck(
  * in the same format that the frontend expects, just changing titles,
  * labels, and file paths.
  */
-async function generatePerCheckReports(results: Result[], resultsDirectory: string) {
+async function generatePerCheckReports(results: Result[], resultsDirectory: string, cleanResultsDirectory: boolean) {
   const perCheckResults = new Map<string, Result>();
 
   results.forEach((result) => {
@@ -286,6 +292,11 @@ async function generatePerCheckReports(results: Result[], resultsDirectory: stri
   });
 
   const perCheckResultsDirectory = path.join(resultsDirectory, 'per-check');
+
+  if (cleanResultsDirectory) {
+    cleanDirectoryContent(resultsDirectory);
+  }
+
   await copySupportingFiles(perCheckResultsDirectory);
 
   let i = 1;
