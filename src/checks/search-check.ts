@@ -20,10 +20,34 @@ export interface SearchCheckResult extends CommonCheckResult {
 }
 
 export interface SearchMatch {
+  /**
+   * The matching text
+   */
   text: string;
+
+  /**
+   * Text before and after the match, if the match length is less than SEARCH_RESULT_SPACE
+   */
   context: [string, string];
+
+  /**
+   * The one-indexed line of the match in the file
+   */
   line: number;
+
+  /**
+   * How many lines does the match span
+   */
+  lineSpan: number;
+
+  /**
+   * The zero-indexed offset of the match relative to the start of its line
+   */
   offset: number;
+
+  /**
+   * The zero-indexed offset of the match relative to the start of the file
+   */
   offsetInFile: number;
 }
 
@@ -131,49 +155,87 @@ export function getSearchMatches(
     }
   }
 
-  return matches;
+  return matches.sort((a, b) => a.offsetInFile - b.offsetInFile);
 }
+
+// The number of characters available to display a result in the list of
+// results. It's a rough estimate, since the display font is not mono space.
+const SEARCH_RESULT_SPACE = 40;
 
 export function search(fileContent: string, patterns: RegExp[]): SearchMatch[] {
   const matches: SearchMatch[] = [];
-  const lines = fileContent.split('\n');
 
   for (const regex of patterns) {
-    let currentLineIndex = 0;
+    Array.from(fileContent.matchAll(regex)).forEach((match) => {
+      const result: SearchMatch = {
+        text: match[0],
+        context: ['', ''], // [before, after]
+        line: 0,
+        offset: 0,
+        offsetInFile: 0,
+        lineSpan: 1,
+      };
 
-    lines.forEach((line, lineIndex) => {
-      const originalLine = line + '\n';
+      if (match.index !== undefined) {
+        const matchLength = result.text.length;
 
-      let lineMatches = Array.from(originalLine.matchAll(regex)).map((match) => {
-        const text = match[0];
+        // Add the result position
+        const startPosition = offsetToPosition(match.index, fileContent);
+        result.line = startPosition.line;
+        result.offset = startPosition.offset;
+        result.offsetInFile = startPosition.offsetInFile;
 
-        let context: [string, string] = ['', '']; // [before, after]
+        // Add the total number of lines
+        const endPosition = offsetToPosition(match.index + matchLength - 1, fileContent);
+        result.lineSpan = endPosition.line - result.line + 1;
 
-        if (match.index && text.length < 44) {
-          const contextLength = Math.floor((44 - text.length) / 2);
+        // Add the result context
+        if (matchLength < SEARCH_RESULT_SPACE) {
+          const halfContextSpace = Math.floor((SEARCH_RESULT_SPACE - matchLength) / 2);
 
-          context[0] = originalLine.substring(match.index - contextLength, match.index);
-          context[1] = originalLine.substring(
-            match.index + text.length,
-            match.index + text.length + contextLength
+          // Read up to half the available context space before the match
+          let contextBefore = readUntilNewline(
+            'backward',
+            fileContent,
+            match.index - 1,
+            halfContextSpace
           );
+
+          // Read up to half the available context space after the match
+          let contextAfter = readUntilNewline(
+            'forward',
+            fileContent,
+            match.index + matchLength,
+            halfContextSpace
+          );
+
+          // If the context before is less than half the available space, use the remaining space
+          // for the context after
+          if (contextBefore.length < halfContextSpace) {
+            contextAfter = readUntilNewline(
+              'forward',
+              fileContent,
+              match.index + matchLength,
+              halfContextSpace + (halfContextSpace - contextBefore.length)
+            );
+          }
+          // If the context after is less than half the available space, use the remaining space
+          // for the context before
+          else if (contextAfter.length < halfContextSpace) {
+            contextBefore = readUntilNewline(
+              'backward',
+              fileContent,
+              match.index - 1,
+              halfContextSpace + (halfContextSpace - contextAfter.length)
+            );
+          }
+
+          result.context[0] = contextBefore;
+          result.context[1] = contextAfter;
         }
+      }
 
-        const offsetOnLine = match.index ?? -Infinity;
-        const offsetInFile = currentLineIndex + offsetOnLine;
-
-        return {
-          text,
-          context,
-          line: lineIndex + 1,
-          offset: offsetOnLine,
-          offsetInFile,
-        };
-      });
-
-      matches.push(...lineMatches);
-
-      currentLineIndex += originalLine.length;
+      matches.push(result);
     });
   }
 
@@ -207,4 +269,59 @@ export function isInRange(existingRanges: [number, number][], index: number, len
   return existingRanges.some(([rangeIndex, rangeLength]) => {
     return index >= rangeIndex && index < rangeIndex + rangeLength && length <= rangeLength;
   });
+}
+
+const newLineRegex = /(\r\n)|(\n)/g;
+
+function offsetToPosition(offset: number, text: string) {
+  const position = {
+    offsetInFile: offset,
+    line: 0,
+    offset: 0,
+  };
+
+  const newLinesBeforeOffset = (text.slice(0, offset).match(newLineRegex) ?? []).length;
+  position.line = newLinesBeforeOffset + 1; // +1 since lines are 1-indexed
+
+  if (offset > 0) {
+    for (let i = offset - 1; i > -1; i--) {
+      if (text[i] === '\n') {
+        break;
+      }
+
+      position.offset++;
+    }
+  }
+
+  return position;
+}
+
+function readUntilNewline(
+  direction: 'backward' | 'forward',
+  text: string,
+  startIndex: number,
+  maxLength: number
+) {
+  let readChars = '';
+  let i = startIndex;
+
+  while (true) {
+    if (i < 0 || i >= text.length || readChars.length === maxLength) {
+      break;
+    }
+
+    if (text[i] === '\n' || (text[i] === '\r' && text[i + 1] === '\n')) {
+      break;
+    }
+
+    if (direction === 'forward') {
+      readChars = readChars + text[i];
+      i++;
+    } else {
+      readChars = text[i] + readChars;
+      i--;
+    }
+  }
+
+  return readChars;
 }
