@@ -136,6 +136,7 @@ export default {
               value: match.text,
               context: match.context,
               line: match.line,
+              lineSpan: match.lineSpan,
               offset: match.offset,
               result,
               resultIndex,
@@ -157,7 +158,17 @@ export default {
     },
 
     fileHighlights() {
-      return String(this.results.list[this.pagination.current - 1]?.line ?? '');
+      const result = this.results.list[this.pagination.current - 1];
+
+      if (result) {
+        const firstLine = result.line;
+
+        return result.lineSpan > 1
+          ? `${firstLine}-${firstLine + result.lineSpan - 1}`
+          : String(firstLine);
+      }
+
+      return '';
     },
 
     details() {
