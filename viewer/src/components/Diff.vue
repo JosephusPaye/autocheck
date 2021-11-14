@@ -1,8 +1,19 @@
 <template>
   <div class="flex flex-col">
-    <div class="ml-auto mb-2">
-      <ToggleButton id="line-by-line" :value.sync="display">Unified</ToggleButton>
-      <ToggleButton id="side-by-side" :value.sync="display">Split</ToggleButton>
+    <div class="flex mb-2">
+      <div>
+        <FeedbackButton ref="copyExpectedButton" @click="copyExpected" label="Copy expected" />
+        <FeedbackButton
+          class="ml-1"
+          ref="copyActualButton"
+          @click="copyActual"
+          label="Copy actual"
+        />
+      </div>
+      <div class="ml-auto">
+        <ToggleButton id="line-by-line" :value.sync="display">Unified</ToggleButton>
+        <ToggleButton id="side-by-side" :value.sync="display">Split</ToggleButton>
+      </div>
     </div>
     <div v-html="diff"></div>
   </div>
@@ -11,12 +22,14 @@
 <script>
 import { createPatch } from 'diff';
 import { parse as parseDiff, html as generateHtml } from 'diff2html';
+import FeedbackButton from './FeedbackButton.vue';
 import ToggleButton from './ToggleButton.vue';
 
 export default {
   name: 'Diff',
 
   components: {
+    FeedbackButton,
     ToggleButton,
   },
 
@@ -50,6 +63,34 @@ export default {
         diffStyle: this.level,
         drawFileList: false,
       });
+    },
+  },
+
+  methods: {
+    copyExpected() {
+      this.copy(this.textA)
+        .then(() => {
+          this.$refs.copyExpectedButton?.setLabel('Copied!');
+        })
+        .catch(e => {
+          this.$refs.copyExpectedButton?.setLabel('Copy failed');
+          console.error(e);
+        });
+    },
+
+    copyActual() {
+      this.copy(this.textB)
+        .then(() => {
+          this.$refs.copyActualButton?.setLabel('Copied!');
+        })
+        .catch(e => {
+          this.$refs.copyActualButton?.setLabel('Copy failed');
+          console.error(e);
+        });
+    },
+
+    copy(text) {
+      return navigator.clipboard.writeText(text);
     },
   },
 };
