@@ -24,6 +24,7 @@ export interface CommonCheckConfiguration {
   type: 'file' | 'command' | 'match' | 'search';
   label: string;
   if?: string;
+  ignore?: boolean;
 }
 
 export interface CommonCheckResult {
@@ -96,6 +97,10 @@ export async function main(
 
     let j = 1;
     for (const check of checks) {
+      if (check.ignore) {
+        continue;
+      }
+
       println(`  running check (${j++}/${checks.length}): `, check.label);
 
       let checkResult: CommonCheckResult;
