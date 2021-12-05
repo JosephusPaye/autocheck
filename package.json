@@ -2,7 +2,7 @@
   "name": "autocheck",
   "description": "Automatically check for patterns against a set of files and executables, and generate a neat report to quickly examine the results.",
   "main": "dist/main.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Josephus Paye II"
   },
