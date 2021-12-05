@@ -72,52 +72,59 @@ test('search()', () => {
   assert.equal(search(SAMPLE_FILE, configPatternsToRegex(['list'], {})), [
     {
       text: 'List',
-      context: ['// Linked', '.cpp: implementation'],
+      context: ['// Linked', '.cpp: implementation of a L'],
       line: 1,
       offset: 9,
       offsetInFile: 9,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['entation of a Linked', ' data structure\n'],
+      context: ['mentation of a Linked', ' data structure'],
       line: 1,
       offset: 45,
       offsetInFile: 45,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['#include "Linked', '.h"\n'],
+      context: ['#include "Linked', '.h"'],
       line: 7,
       offset: 16,
       offsetInFile: 182,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['Linked', '::LinkedList() {\n'],
+      context: ['Linked', '::LinkedList() {'],
       line: 10,
       offset: 6,
       offsetInFile: 216,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['LinkedList::Linked', '() {\n'],
+      context: ['LinkedList::Linked', '() {'],
       line: 10,
       offset: 18,
       offsetInFile: 228,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['    this->lengthOf', ' = 0;\n'],
+      context: ['    this->lengthOf', ' = 0;'],
       line: 14,
       offset: 18,
       offsetInFile: 327,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['        Linked', ' here\n'],
+      context: ['        Linked', ' here'],
       line: 19,
       offset: 14,
       offsetInFile: 416,
+      lineSpan: 1,
     },
   ]);
 
@@ -141,10 +148,11 @@ test('search()', () => {
     [
       {
         text: 'LinkedList::LinkedList',
-        context: ['', ''],
+        context: ['', '() {'],
         line: 10,
         offset: 0,
         offsetInFile: 210,
+        lineSpan: 1,
       },
     ]
   );
@@ -166,31 +174,35 @@ test('getSearchMatches()', () => {
   assert.equal(getSearchMatches(SAMPLE_FILE, configPatternsToRegex(['list'], {}), skipComments), [
     {
       text: 'List',
-      context: ['#include "Linked', '.h"\n'],
+      context: ['#include "Linked', '.h"'],
       line: 7,
       offset: 16,
       offsetInFile: 182,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['Linked', '::LinkedList() {\n'],
+      context: ['Linked', '::LinkedList() {'],
       line: 10,
       offset: 6,
       offsetInFile: 216,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['LinkedList::Linked', '() {\n'],
+      context: ['LinkedList::Linked', '() {'],
       line: 10,
       offset: 18,
       offsetInFile: 228,
+      lineSpan: 1,
     },
     {
       text: 'List',
-      context: ['    this->lengthOf', ' = 0;\n'],
+      context: ['    this->lengthOf', ' = 0;'],
       line: 14,
       offset: 18,
       offsetInFile: 327,
+      lineSpan: 1,
     },
   ]);
 });
