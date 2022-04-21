@@ -4,10 +4,12 @@
     :style="{ width: !expanded ? '32px' : undefined, 'max-height': '800px' }"
   >
     <div
-      class="flex capitalize bg-gray-300 px-4 py-2 font-semibold rounded-t"
+      class="flex bg-gray-300 px-4 py-2 font-semibold rounded-t"
       :class="{ 'h-full rounded-b': !expanded }"
     >
-      <span v-show="expanded">{{ type }} <span class="lowercase">check</span></span>
+      <div v-show="expanded">
+        <span class="capitalize">{{ type }}</span> check
+      </div>
       <button
         :class="[expanded ? 'ml-auto -mr-2' : '-ml-3']"
         :title="expanded ? 'Collapse' : 'Expand'"
@@ -30,6 +32,11 @@
         </svg>
       </button>
     </div>
+
+    <div v-if="error" v-show="expanded" class="px-4 pt-3 border-l border-r border-gray-300">
+      <div class="bg-red-300 rounded px-4 py-3 text-sm font-semibold">⚠ Failed: {{ error }}</div>
+    </div>
+
     <div class="border border-gray-300 border-t-0 rounded-b h-full flex flex-col" v-show="expanded">
       <div v-if="details" class="p-4 border-b border-gray-300">
         <div v-for="(detail, i) in details" :key="i" class="grid gap-3 detail leading-none">
@@ -59,6 +66,7 @@ export default {
 
   props: {
     type: String,
+    error: String,
     details: Array,
     expanded: Boolean,
   },

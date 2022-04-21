@@ -9,6 +9,7 @@
       slot="meta"
       :type="check.config.type"
       :details="details"
+      :error="check.status === 'failed' ? check.error : undefined"
       :expanded.sync="sidebarExpanded"
     >
       <FileTree
