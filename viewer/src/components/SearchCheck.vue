@@ -25,13 +25,16 @@
       <div v-if="isImage(file.type)" class="overflow-auto w-full" style="height: 800px;">
         <img :src="file.url" />
       </div>
-      <Prism
-        v-else-if="isText(file.type)"
-        style="height: 800px; overflow-x: auto"
-        :fileExtension="file.type"
-        :code="getFileContent(file.relativePath)"
-        :highlightLines="fileHighlights"
-      />
+      <template v-else-if="isText(file.type)">
+        <!-- Don't render the Prism code block if we're not expanded -->
+        <Prism
+          v-if="check.expanded"
+          style="height: 800px; overflow-x: auto"
+          :fileExtension="file.type"
+          :code="getFileContent(file.relativePath)"
+          :highlightLines="fileHighlights"
+        />
+      </template>
       <embed
         v-else-if="file.type === 'pdf'"
         scale="tofit"
