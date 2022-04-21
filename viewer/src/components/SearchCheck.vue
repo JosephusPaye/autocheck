@@ -71,6 +71,24 @@
       class="flex flex-col w-full border rounded justify-center items-center p-5 h-full"
     >
       <svg
+        v-if="passWhenFound"
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-red-500"
+      >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+      </svg>
+      <svg
+        v-else
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -85,9 +103,7 @@
         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
         <polyline points="22 4 12 14.01 9 11.01"></polyline>
       </svg>
-      <span class="mt-3 text-lg text-gray-700"
-        >{{ passWhenFound ? 'Patterns found' : 'Patterns not found' }}
-      </span>
+      <span class="mt-3 text-lg text-gray-700">Patterns not found</span>
     </div>
   </CheckResult>
 </template>
@@ -194,13 +210,6 @@ export default {
           values: [this.check.config.passWhen ?? 'found'],
         },
       ];
-
-      if (this.check.error) {
-        details.push({
-          label: 'Error',
-          values: [this.check.error],
-        });
-      }
 
       return details;
     },
