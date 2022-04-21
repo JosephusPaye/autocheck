@@ -1,9 +1,5 @@
 <template>
-  <CheckResult
-    :label="check.config.label"
-    :status="check.status"
-    :sidebarExpanded="sidebarExpanded"
-  >
+  <CheckResult :check="check" :sidebarExpanded="sidebarExpanded">
     <CheckDetails
       slot="meta"
       :type="check.config.type"
