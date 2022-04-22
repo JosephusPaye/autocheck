@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs';
-import url from 'url';
 import filenamify from 'filenamify';
 
 import { writeString, copyDirectory, readStringAndCache } from '../util/fs';
