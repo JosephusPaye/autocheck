@@ -22,7 +22,7 @@ export async function createReport(
 
   const reportFilePath = path.join(
     resultsDirectory,
-    filenamify(fileNamePrepend + result.title.trim()) + '.html'
+    filenamify(fileNamePrepend + result.title.trim(), { replacement: '_' }) + '.html'
   );
 
   await writeString(reportFilePath, report);
