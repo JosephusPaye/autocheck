@@ -111,7 +111,7 @@
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
-          <span class="mt-3 text-lg text-gray-700">{{ check.error }}</span>
+          <span class="mt-3 text-lg text-gray-700 text-center">{{ check.error }}</span>
         </div>
         <template v-else-if="$slots.preview">
           <slot name="preview"></slot>
