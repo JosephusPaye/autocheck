@@ -15,7 +15,13 @@ import {
 } from './checks/search-check';
 
 import { print, println } from './util/console';
-import { getFileCache, fileExists, directoryExists, listDirectories, cleanDirectoryContent } from './util/fs';
+import {
+  getFileCache,
+  fileExists,
+  directoryExists,
+  listDirectories,
+  cleanDirectoryContent,
+} from './util/fs';
 import { quote } from './util/string';
 
 import { copySupportingFiles, createReport, generateReportsIndex } from './report/report';
@@ -67,7 +73,7 @@ export async function main(
   checksFileArg: string,
   targetDirectoryArgs: string[],
   useSubfolders: boolean,
-  cleanResultsDirectory: boolean,
+  cleanResultsDirectory: boolean
 ) {
   const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
@@ -178,7 +184,11 @@ export async function main(
 
   if (results.length > 1) {
     println(color.blue('generating per-check reports...'));
-    const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory, cleanResultsDirectory);
+    const perCheckResultsDirectory = await generatePerCheckReports(
+      results,
+      resultsDirectory,
+      cleanResultsDirectory
+    );
 
     println();
     println(color.blue('generating indexes...'));
@@ -264,7 +274,11 @@ async function performCheck(
  * in the same format that the frontend expects, just changing titles,
  * labels, and file paths.
  */
-async function generatePerCheckReports(results: Result[], resultsDirectory: string, cleanResultsDirectory: boolean) {
+async function generatePerCheckReports(
+  results: Result[],
+  resultsDirectory: string,
+  cleanResultsDirectory: boolean
+) {
   const perCheckResults = new Map<string, Result>();
 
   results.forEach((result) => {

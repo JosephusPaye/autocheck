@@ -16,7 +16,7 @@ const prog = sade('autocheck <checks-file> <target-directory>')
     (
       checksFile: string,
       targetDirectory: string,
-      options: { _: string[]; subfolders: boolean, clean: boolean }
+      options: { _: string[]; subfolders: boolean; clean: boolean }
     ) => {
       main(checksFile, [targetDirectory].concat(options._), options.subfolders, options.clean);
     }
