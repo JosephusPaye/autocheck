@@ -61,12 +61,14 @@ export interface Result {
   fileContents: Record<string, string>;
 }
 
-function relative(pathToPrint: string) {
+function prettyPath(pathToPrint: string) {
   return path.isAbsolute(pathToPrint)
     ? pathToPrint
         .replace(process.cwd() + path.sep, '.' + path.sep)
         .replace(process.cwd(), '.' + path.sep)
-    : pathToPrint;
+        .replace(/\\/g, '/')
+        .replace(/^\.\//, '')
+    : pathToPrint.replace(/\\/g, '/').replace(/^\.\//, '');
 }
 
 export async function main(
@@ -78,7 +80,7 @@ export async function main(
   const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
 
-  println(color.blue(`running checks from ${relative(checksFile)}`));
+  println(color.blue(`running checks from ${prettyPath(checksFile)}`));
   println();
 
   const targetDirectories = await resolveTargetDirectories(targetDirectoryArgs, useSubfolders);
@@ -95,7 +97,9 @@ export async function main(
   let i = 1;
   for (let directory of targetDirectories) {
     println(
-      color.blue(`checking directory (${i++}/${targetDirectories.length}): ${relative(directory)}`)
+      color.blue(
+        `checking directory (${i++}/${targetDirectories.length}): ${prettyPath(directory)}`
+      )
     );
 
     const completedChecks: CompletedChecksStatus = new Map();
@@ -177,7 +181,7 @@ export async function main(
     results.push(result);
 
     const reportFilePath = await createReport(result, resultsDirectory);
-    println('  generated report: ', relative(reportFilePath));
+    println('  generated report: ', prettyPath(reportFilePath));
 
     println();
   }
@@ -194,10 +198,10 @@ export async function main(
     println(color.blue('generating indexes...'));
 
     let outputFile = await generateReportsIndex(resultsDirectory);
-    println('  per-target index: ', relative(outputFile));
+    println('  per-target index: ', prettyPath(outputFile));
 
     outputFile = await generateReportsIndex(perCheckResultsDirectory);
-    println('  per-check index: ', relative(outputFile));
+    println('  per-check index: ', prettyPath(outputFile));
 
     println();
   }
@@ -325,7 +329,7 @@ async function generatePerCheckReports(
       perCheckResultsDirectory,
       String(i++).padStart(2, '0') + '. '
     );
-    println('  check report: ', relative(outputFile));
+    println('  check report: ', prettyPath(outputFile));
   }
 
   return perCheckResultsDirectory;
