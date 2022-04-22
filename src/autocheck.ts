@@ -206,7 +206,7 @@ export async function main(
     println();
   }
 
-  println(color.blue('done'));
+  println(color.blue('finishing up...'));
 }
 
 async function resolveTargetDirectories(targetDirectoryArgs: string[], useSubfolders: boolean) {
