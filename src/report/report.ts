@@ -55,7 +55,7 @@ export async function generateReportsIndex(
       return {
         name: name.replace('.html', ''),
         path: reportPath,
-        url: url.pathToFileURL(reportPath),
+        url: name,
       };
     });
 
