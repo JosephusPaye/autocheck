@@ -43,7 +43,10 @@ export async function copySupportingFiles(resultsDirectory: string) {
 }
 
 const indexTemplatePath = path.join(__dirname, 'index-template.html');
-export async function generateReportsIndex(resultsDirectory: string) {
+export async function generateReportsIndex(
+  resultsDirectory: string,
+  reportTitle = 'Autocheck Reports'
+) {
   const files = fs
     .readdirSync(resultsDirectory)
     .filter((name) => name.endsWith('.html') && name !== 'index.html')
@@ -61,7 +64,9 @@ export async function generateReportsIndex(resultsDirectory: string) {
   });
 
   const template = await getTemplate(indexTemplatePath);
-  const html = template.replace('{{ $REPORT_LINKS }}', links.join('\n'));
+  const html = template
+    .replace('{{ $TITLE }}', reportTitle)
+    .replace('{{ $REPORT_LINKS }}', links.join('\n'));
 
   const fileName = path.join(resultsDirectory, 'index.html');
 

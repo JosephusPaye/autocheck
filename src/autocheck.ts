@@ -197,10 +197,13 @@ export async function main(
     println();
     println(color.blue('generating indexes...'));
 
-    let outputFile = await generateReportsIndex(resultsDirectory);
+    let outputFile = await generateReportsIndex(resultsDirectory, 'Autocheck Reports');
     println('  per-target index: ', prettyPath(outputFile));
 
-    outputFile = await generateReportsIndex(perCheckResultsDirectory);
+    outputFile = await generateReportsIndex(
+      perCheckResultsDirectory,
+      'Autocheck Per-check Reports'
+    );
     println('  per-check index: ', prettyPath(outputFile));
 
     println();
