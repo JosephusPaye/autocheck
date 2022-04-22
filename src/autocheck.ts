@@ -15,7 +15,13 @@ import {
 } from './checks/search-check';
 
 import { print, println } from './util/console';
-import { getFileCache, fileExists, directoryExists, listDirectories, cleanDirectoryContent } from './util/fs';
+import {
+  getFileCache,
+  fileExists,
+  directoryExists,
+  listDirectories,
+  cleanDirectoryContent,
+} from './util/fs';
 import { quote } from './util/string';
 
 import { copySupportingFiles, createReport, generateReportsIndex } from './report/report';
@@ -67,7 +73,8 @@ export async function main(
   checksFileArg: string,
   targetDirectoryArgs: string[],
   useSubfolders: boolean,
-  cleanResultsDirectory: boolean,
+  outputSuffix: string,
+  cleanResultsDirectory: boolean
 ) {
   const checksFile = await findChecksFile(checksFileArg);
   const checks = getChecks(checksFile);
@@ -170,7 +177,7 @@ export async function main(
 
     results.push(result);
 
-    const reportFilePath = await createReport(result, resultsDirectory);
+    const reportFilePath = await createReport(result, resultsDirectory, '', outputSuffix);
     println('  generated report: ', relative(reportFilePath));
 
     println();
@@ -178,15 +185,20 @@ export async function main(
 
   if (results.length > 1) {
     println(color.blue('generating per-check reports...'));
-    const perCheckResultsDirectory = await generatePerCheckReports(results, resultsDirectory, cleanResultsDirectory);
+    const perCheckResultsDirectory = await generatePerCheckReports(
+      results,
+      resultsDirectory,
+      outputSuffix,
+      cleanResultsDirectory
+    );
 
     println();
     println(color.blue('generating indexes...'));
 
-    let outputFile = await generateReportsIndex(resultsDirectory);
+    let outputFile = await generateReportsIndex(resultsDirectory, outputSuffix);
     println('  per-target index: ', relative(outputFile));
 
-    outputFile = await generateReportsIndex(perCheckResultsDirectory);
+    outputFile = await generateReportsIndex(perCheckResultsDirectory, outputSuffix);
     println('  per-check index: ', relative(outputFile));
 
     println();
@@ -264,7 +276,12 @@ async function performCheck(
  * in the same format that the frontend expects, just changing titles,
  * labels, and file paths.
  */
-async function generatePerCheckReports(results: Result[], resultsDirectory: string, cleanResultsDirectory: boolean) {
+async function generatePerCheckReports(
+  results: Result[],
+  resultsDirectory: string,
+  outputSuffix: string,
+  cleanResultsDirectory: boolean
+) {
   const perCheckResults = new Map<string, Result>();
 
   results.forEach((result) => {
@@ -309,7 +326,8 @@ async function generatePerCheckReports(results: Result[], resultsDirectory: stri
     const outputFile = await createReport(
       check,
       perCheckResultsDirectory,
-      String(i++).padStart(2, '0') + '. '
+      String(i++).padStart(2, '0') + '. ',
+      outputSuffix
     );
     println('  check report: ', relative(outputFile));
   }

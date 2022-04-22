@@ -12,7 +12,8 @@ const reportTemplatePath = path.join(viewerDistDirectory, 'index.html');
 export async function createReport(
   result: Result,
   resultsDirectory: string,
-  fileNamePrepend: string = ''
+  fileNamePrepend: string = '',
+  fileNameAppend: string = ''
 ): Promise<string> {
   const template = await getTemplate(reportTemplatePath);
 
@@ -22,7 +23,7 @@ export async function createReport(
 
   const reportFilePath = path.join(
     resultsDirectory,
-    filenamify(fileNamePrepend + result.title.trim()) + '.html'
+    filenamify(fileNamePrepend + result.title.trim() + fileNameAppend) + '.html'
   );
 
   await writeString(reportFilePath, report);
@@ -43,10 +44,10 @@ export async function copySupportingFiles(resultsDirectory: string) {
 }
 
 const indexTemplatePath = path.join(__dirname, 'index-template.html');
-export async function generateReportsIndex(resultsDirectory: string) {
+export async function generateReportsIndex(resultsDirectory: string, outputSuffix: string) {
   const files = fs
     .readdirSync(resultsDirectory)
-    .filter((name) => name.endsWith('.html') && name !== 'index.html')
+    .filter((name) => !name.startsWith('index') && name.endsWith('.html'))
     .map((name) => {
       const reportPath = path.join(resultsDirectory, name);
       return {
@@ -63,7 +64,7 @@ export async function generateReportsIndex(resultsDirectory: string) {
   const template = await getTemplate(indexTemplatePath);
   const html = template.replace('{{ $REPORT_LINKS }}', links.join('\n'));
 
-  const fileName = path.join(resultsDirectory, 'index.html');
+  const fileName = path.join(resultsDirectory, 'index' + outputSuffix + '.html');
 
   await writeString(fileName, html);
 
