@@ -1,6 +1,6 @@
 import path from 'path';
 import upath from 'upath';
-import execa from 'execa';
+import execa, { ExecaError } from 'execa';
 import { ReadStream } from 'fs';
 
 import { fileExists, directoryExists, createReadStream } from '../util/fs';
@@ -78,6 +78,10 @@ export async function performCommandCheck(
   let error: string | undefined;
   let exitCode: number;
 
+  const subProcessStatus = {
+    killedAfterTimeout: false,
+  };
+
   try {
     const subprocess = execa(commandParts[0], commandParts.slice(1), {
       shell: true,
@@ -87,7 +91,7 @@ export async function performCommandCheck(
       all: true,
     });
 
-    const cancelTimeout = killAfterTimeout(subprocess, 10000);
+    const cancelTimeout = killAfterTimeout(subprocess, 10000, subProcessStatus);
 
     const commandResult = await subprocess;
     cancelTimeout();
@@ -95,12 +99,11 @@ export async function performCommandCheck(
     output = commandResult.all;
     exitCode = commandResult.exitCode;
   } catch (err) {
-    output = err.all;
-    exitCode = err.exitCode ?? -1;
+    output = (err as ExecaError).all;
+    exitCode = (err as ExecaError).exitCode ?? -1;
 
-    if (err.isCanceled) {
-      error =
-        'command cancelled after timeout. if the command expects std input, set the `input` option.';
+    if ((err as ExecaError).killed && subProcessStatus.killedAfterTimeout) {
+      error = 'killed after 10s timeout. if the command expects std input, set the `input` option.';
     }
   }
 
@@ -140,12 +143,21 @@ function toCygpath(location: string) {
   return locationPosix.replace(root, `/cygdrive/${rootLetter.toLowerCase()}`);
 }
 
-function killAfterTimeout(subprocess: execa.ExecaChildProcess, timeout: number) {
+function killAfterTimeout(
+  subprocess: execa.ExecaChildProcess,
+  timeout: number,
+  status: { killedAfterTimeout: boolean }
+) {
   const timeoutId = setTimeout(() => {
-    subprocess.cancel();
+    status.killedAfterTimeout = true;
+
+    subprocess.kill('SIGKILL');
+
+    console.log('sent SIGKILL');
   }, timeout);
 
   return () => {
+    status.killedAfterTimeout = false;
     clearTimeout(timeoutId);
   };
 }
