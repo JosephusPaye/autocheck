@@ -37,7 +37,7 @@ export function parseJsRegex(string: string) {
 
   const flags = match[1];
 
-  return new RegExp(pattern, flags + 'g'); // it's always a global match
+  return new RegExp(pattern, flags.includes('g') ? flags : flags + 'g'); // always global
 }
 
 export function escapeForRegex(string: string) {
