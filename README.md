@@ -217,12 +217,12 @@ And [this report (screenshot)](https://github.com/JosephusPaye/autocheck/raw/mas
 
 The following options are common to all checks:
 
-| Option  | Type    | Presence | Description                                                                                                                        |
-| ------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `type`  | String  | Required | The type of check, one of `"file"`, `"command"`, or `"match"`                                                                      |
-| `label` | String  | Required | The label of the check to show in the report                                                                                       |
-| `if`    | String  | Optional | The name of another check to wait for before running the check. If set, the check will only be run if the referenced check passes. |
-| `skip`  | Boolean | Optional | If set to `true`, the check will be skipped.                                                                                       |
+| Option  | Type    | Presence | Description                                                                                                                         |
+| ------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `type`  | String  | Required | The type of check, one of `"file"`, `"command"`, `"match"`, or `"search"`                                                           |
+| `label` | String  | Required | The label of the check to show in the report                                                                                        |
+| `if`    | String  | Optional | The label of another check to wait for before running the check. If set, the check will only be run if the referenced check passes. |
+| `skip`  | Boolean | Optional | If set to `true`, the check will be skipped.                                                                                        |
 
 ### File check
 
