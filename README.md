@@ -1,19 +1,19 @@
 # Autocheck
 
-✅ Autocheck is a command-line tool that allows you to automatically check for patterns against a set of files and executables, and generate a neat report to quickly examine the results. It can be a very useful aid when marking programming assignments.
+Autocheck is a command-line tool that allows you to automatically check for patterns against a set of files and executables, and generate a report to quickly examine the results. It can be a very useful aid when marking programming assignments.
 
-Autocheck is not an auto-grader or auto-marker, and has no special understanding of the files it processes, or the commands it runs. Instead, it provides a simple framework for automating many of the manual checks that are involved with marking programming assignments. You use it by configuring a series of checks in a JSON file, and then running those checks against one or more target directories. The results are automatically consolidated into neat reports that are optimised for scanning, to save you time.
+Autocheck is not an auto-grader or auto-marker, and has no special understanding of the files it processes, or the commands it runs. Instead, it provides a simple framework for automating many of the manual checks that are involved with marking programming assignments. You use it by configuring a series of checks in a JSON file, and then running those checks against one or more target directories. The results are automatically consolidated into reports that are optimised for scanning, to save you time.
 
 With Autocheck, you can automatically run checks that:
 
 - Look for specific files (text files, code files, PDFs, and images), and embed them in the report. Use this to check for READMEs, assignment cover sheets, etc.
-- Execute commands (with an input file for stdin), and embed the output in the report. Use this to compile and run code. It even supports running commands in [Cygwin](https://cygwin.com/) on Windows.
+- Execute commands (with the option of using a file as stdin), and embed the output in the report. Use this to compile and run code. It even supports running commands in [Cygwin](https://cygwin.com/) on Windows.
 - Compare files or output from commands against an expected result, and show any differences in the report. Use this to compare the output of student code to some expected standard.
-- Search for the presence or absence of specific strings in specific files, optionally using a regex. It's smart enough to skip comments. Use this to find keywords and special strings.
+- Search for the presence or absence of specific strings in specific files, optionally using a regex. It's smart enough to skip comments in source code. Use this to find keywords and special patterns.
 
 ---
 
-This project is part of [#CreateWeekly](https://twitter.com/JosephusPaye/status/1214853295023411200), my attempt to create something new publicly every week in 2020.
+This project started as a part of [#CreateWeekly](https://twitter.com/JosephusPaye/status/1214853295023411200), my attempt to create something new publicly every week in 2020.
 
 ## Installation
 
@@ -299,14 +299,14 @@ Use this check to look for specific strings and keywords in text/code files, and
 
 This check supports the following configuration options (in additional to the common options described above):
 
-| Option         | Type                      | Presence | Description                                                                                                                                                                                                                                                                                                                                                         |
-| -------------- | ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `filePatterns` | List&nbsp;of&nbsp;Strings | Required | A list of file path patterns ([globs](<https://en.wikipedia.org/wiki/Glob_(programming)>)), relative to the target directory. For example, `["**/*.{h,cpp,txt}"]` will match all `.h`, `.cpp`, and `.txt` files in the target directory.                                                                                                                            |
-| `patterns`     | List of Strings           | Required | A list of patterns to search for, can be strings or regular expressions. For example, `["friend", "struct"]` will match files with the string `friend` or `struct`, while `["if\s*\(", "while\s*\("]` will match the start of `if` and `while` statements.                                                                                                          |
-| `matchCase`    | Boolean                   | Optional | For non-regex patterns, use case-sensitive matching. Default is `false`.                                                                                                                                                                                                                                                                                            |
-| `matchAsRegex` | Boolean                   | Optional | Match the patterns as regular expressions. Default is `false`.                                                                                                                                                                                                                                                                                                      |
-| `skipComments` | Boolean or Array          | Optional | Skip strings in comments when matching. Default is `false`. Strings are considered comments if they fall within the range of the given array of delimiters. For example, `[["/*", "*/"], "//"]` will skip strings between `/*` and `*/`, as well as strings between `//` and a new line. Set to `true` to match the default C-style comments: `/*` + `*/` and `//`. |
-| `passWhen`     | `found` or `not-found`    | Optional | Choose when to mark the check as passed. Setting to `found` will pass the check if a pattern is found, and fail it otherwise. Setting to `not-found` will fail the check if a pattern is found, and pass it otherwise.                                                                                                                                              |
+| Option         | Type                      | Presence | Description                                                                                                                                                                                                                                                                                                                                                                |
+| -------------- | ------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filePatterns` | List&nbsp;of&nbsp;Strings | Required | A list of file path patterns ([globs](<https://en.wikipedia.org/wiki/Glob_(programming)>)), relative to the target directory. For example, `["**/*.{h,cpp,txt}"]` will match all `.h`, `.cpp`, and `.txt` files in the target directory.                                                                                                                                   |
+| `patterns`     | List of Strings           | Required | A list of patterns to search for, can be strings or regular expressions. For example, `["friend", "struct"]` will match files with the string `friend` or `struct`, while `["if\s*\(", "while\s*\("]` will match the start of `if` and `while` statements.                                                                                                                 |
+| `matchCase`    | Boolean                   | Optional | For non-regex patterns, use case-sensitive matching. Default is `false`.                                                                                                                                                                                                                                                                                                   |
+| `matchAsRegex` | Boolean                   | Optional | Match the patterns as [JavaScript regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions). The `/` and `/` delimiters are optional: patterns that don't start with `/` will be wrapped with `/<pattern>/i`, which means matching will be case-insensitive. All regex patterns, delimited or not, will be matched globally. |
+| `skipComments` | Boolean or Array          | Optional | Skip strings in comments when matching. Default is `false`. Strings are considered comments if they fall within the range of the given array of delimiters. For example, `[["/*", "*/"], "//"]` will skip strings between `/*` and `*/`, as well as strings between `//` and a new line. Set to `true` to match the default C-style comments: `/*` + `*/` and `//`.        |
+| `passWhen`     | `found` or `not-found`    | Optional | Choose when to mark the check as passed. Setting to `found` will pass the check if a pattern is found, and fail it otherwise. Setting to `not-found` will fail the check if a pattern is found, and pass it otherwise.                                                                                                                                                     |
 
 ## What's next
 
@@ -315,8 +315,8 @@ This check supports the following configuration options (in additional to the co
 - [x] Add colors to the CLI output
 - [ ] Warn when commands block for stdin if there's no `input` specified
 - [x] Add search check
-- [ ] Add support for user-defined checks (bring your own checks)
-- [ ] Improve check navigation - add collapse/expand all checks button to header, scroll to next (arrow down icon), and scroll to previous (arrow up icon) buttons, with smooth scrolling
+- ~~[ ] Add support for user-defined checks (bring your own checks)~~ - this need is largely served by command checks.
+- [x] Improve check navigation - add collapse/expand all checks button to header, ~~scroll to next (arrow down icon), and scroll to previous (arrow up icon) buttons, with smooth scrolling~~ - better served by "Jump to..." menu
 
 ## Licence
 
