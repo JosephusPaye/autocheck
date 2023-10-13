@@ -317,6 +317,7 @@ This check supports the following configuration options (in additional to the co
 - [x] Add search check
 - ~~[ ] Add support for user-defined checks (bring your own checks)~~ - this need is largely served by command checks.
 - [x] Improve check navigation - add collapse/expand all checks button to header, ~~scroll to next (arrow down icon), and scroll to previous (arrow up icon) buttons, with smooth scrolling~~ - better served by "Jump to..." menu
+- [ ] Add AST aware checks, using something like [Clang's AST JSON dump](https://stackoverflow.com/a/59417943)
 
 ## Licence
 
